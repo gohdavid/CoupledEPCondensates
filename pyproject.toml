@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "utils"
+version = "0.1.0"
+description = ""
+authors = ["Pradeep Natarajan <pradeepn@mit.edu>", "David David <davidgoh@mit.edu>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11"
+FiPy = "^3.4.4"
+tqdm = "^4.66.1"
+numpy = "^1.26.0"
+h5py = "^3.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,2 @@
+basal_k_production, [30.0, 40.0, 50.0]
+initial_values, [[3.6, 0.0]]
