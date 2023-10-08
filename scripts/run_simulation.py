@@ -1,8 +1,7 @@
+#!/usr/bin/env python
 """Main script to assemble and run phase field simulations
 """
 
-import sys
-sys.path.append('../')
 import argparse
 import utils.file_operations as file_operations
 import utils.simulation_helper as simulation_helper

@@ -3,7 +3,7 @@
 
 import fipy as fp
 import numpy as np
-import reaction_rates as rates
+from . import reaction_rates as rates
 
 
 class TwoComponentModel(object):

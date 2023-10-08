@@ -1,10 +1,10 @@
 """Module that contains helper functions to run simulations that can be used by run_simulation.py
 """
 
-import geometry
-import initial_conditions
-import free_energy
-import dynamical_equations
+from . import geometry
+from . import initial_conditions
+from . import free_energy
+from . import dynamical_equations
 import fipy as fp
 
 
