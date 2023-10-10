@@ -461,6 +461,6 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionless(object):
             is not 2x1"
 
         # Calculate the Jacobian matrix
-        jacobian = np.array([[3 * (c_vector[0] - self._c_bar_1) ** 2 + self._beta_tilde, self._gamma_tilde],
-                             [self._gamma_tilde/self._lambda_tilde, 1.0]])
+        jacobian = [[3 * (c_vector[0] - self._c_bar_1) ** 2 + self._beta_tilde, self._gamma_tilde],
+                             [self._gamma_tilde/self._lambda_tilde, 1.0]]
         return jacobian

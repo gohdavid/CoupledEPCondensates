@@ -121,8 +121,8 @@ class TwoComponentModel(object):
         #          == fp.DiffusionTerm(coeff=(-self._M1, self._free_energy.kappa), var=c_vector[0])
         #          )
         eqn_1 = (fp.TransientTerm(coeff=1.0, var=c_vector[0])
-                 == fp.DiffusionTerm(coeff=self._M1 * jacobian[0, 0], var=c_vector[0])
-                 + fp.DiffusionTerm(coeff=self._M1 * jacobian[0, 1], var=c_vector[1])
+                 == fp.DiffusionTerm(coeff=self._M1 * jacobian[0][0], var=c_vector[0])
+                 + fp.DiffusionTerm(coeff=self._M1 * jacobian[0][1], var=c_vector[1])
                  - fp.DiffusionTerm(coeff=(self._M1, self._free_energy.kappa), var=c_vector[0])
                  - self._M1 * (self._free_energy.get_gaussian_function(c_vector[0].mesh)).faceGrad.divergence
                  )
@@ -151,15 +151,15 @@ class TwoComponentModel(object):
         if self._modelAB_dynamics_type == 1:
             # Model AB dynamics for species 2
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
-                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1, 0], var=c_vector[0])
-                     + fp.DiffusionTerm(coeff=self._M2 * jacobian[1, 1], var=c_vector[1])
+                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][0], var=c_vector[0])
+                     + fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
                      + self._production_term.rate(c_vector[0])
                      - self._degradation_term.rate(c_vector[1])
                      )
         elif self._modelAB_dynamics_type == 2:
             # Reaction-diffusion dynamics for species 2
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
-                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1, 1], var=c_vector[1])
+                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
                      + self._production_term.rate(c_vector[0])
                      - self._degradation_term.rate(c_vector[1])
                      )
