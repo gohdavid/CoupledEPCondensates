@@ -123,7 +123,7 @@ class TwoCompDoubleWellFHCrossQuadratic(object):
               - self.get_gaussian_function(c_vector[0].mesh) * c_vector[0]
               + self._gamma * c_vector[0] * c_vector[1]
               + self._lambda * c_vector[1] ** 2
-              + 0.5 * self._kappa * c_vector[1].grad.mag ** 2)
+              + 0.5 * self._kappa * c_vector[0].grad.mag ** 2)
 
         return fe
 
@@ -336,7 +336,7 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionless(object):
               - self.get_gaussian_function(c_vector[0].mesh) * c_vector[0]
               + self._gamma_tilde * c_vector[0] * c_vector[1]
               + 0.5 * self._lambda_tilde * c_vector[1] ** 2
-              + 0.5 * self._kappa_tilde * c_vector[1].grad.mag ** 2)
+              + 0.5 * self._kappa_tilde * c_vector[0].grad.mag ** 2)
 
         return fe
 
