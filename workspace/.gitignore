@@ -1,3 +1,4 @@
 /.quarto/
 _*
 !_output
+!_quarto.yml
