@@ -1,5 +1,4 @@
-name:
-  - CoupledEPCondensates
+name: CoupledEPCondensates
 channels:
   - conda-forge
 dependencies:

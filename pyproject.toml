@@ -16,7 +16,7 @@ gmsh = "^4.11.1"
 pandas = "^2.1.1"
 seaborn = "^0.13.0"
 ipykernel = "^6.25.2"
-matplotlib = "^3.8.0"
+matplotlib = "~3.7"
 
 
 [build-system]
