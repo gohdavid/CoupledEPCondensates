@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Script to sweep through different parameters in an input_parameters file over values defined in a sweep_parameters file
 """
