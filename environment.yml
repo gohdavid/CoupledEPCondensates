@@ -2,6 +2,6 @@ name: CoupledEPCondensates
 channels:
   - conda-forge
 dependencies:
-  - python==3.11
+  - python >=3.10, <3.11
   - pip
-  - poetry==1.6.1
+  - poetry >=1.6, <1.7

@@ -1,6 +1,11 @@
 # PF_Stability_Analysis
 
-Use the environment.yml file provided to set up your python environment. 
+Use `setup.sh` to set up the Conda environment.
+This project uses Conda and Poetry.
+See `pyproject.toml` for dependencies.
+
+Gmsh is installed externally and loaded with `module load gmsh/4.10.5`.
+An alternative is to use `poetry add gmsh` or `pip install gmsh` on the Conda environment.
 
 To run the simulations:
 

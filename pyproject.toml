@@ -7,10 +7,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11"
+python = ">=3.10, <=3.11"
 FiPy = "^3.4.4"
 tqdm = "^4.66.1"
-numpy = "^1.26.0"
 h5py = "^3.9.0"
 pandas = "^2.1.1"
 seaborn = "^0.13.0"
