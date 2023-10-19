@@ -27,7 +27,8 @@ def get_output_dir_name(input_params):
                  + '_K_spatial_' + str(input_params['k_production']) \
                  + '_c_initial_' + str(input_params['initial_values'][0]) + '_noise_variance_' \
                  + str(input_params['initial_condition_noise_variance'][0]) \
-                 + '_reaction_sigma_' + str(input_params['reaction_sigma'])
+                 + '_reaction_sigma_' + str(input_params['reaction_sigma']) \
+                 + '_location_' + str(input_params['location'])
     # + '_well_depth_' + str(input_params['well_depth'])
     # + '_reaction_sigma_' + str(input_params['reaction_sigma'])
     return output_dir
