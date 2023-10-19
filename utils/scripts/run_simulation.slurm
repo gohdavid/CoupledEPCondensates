@@ -15,7 +15,7 @@ stage_parameters()
 run_program()
 {
     source activate CoupledEPCondensates
-    python run_simulation.py --i $input_file --o $out_folder
+    run-simulation --i $input_file --o $out_folder
     conda deactivate
 }
 
