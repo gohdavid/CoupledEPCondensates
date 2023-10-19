@@ -3,3 +3,6 @@ _*
 !_output
 !_quarto.yml
 !_assets
+input_parameters*
+*.out
+M_*
