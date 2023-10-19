@@ -1,7 +1,7 @@
+#!/usr/bin/env python
 """Main script to generate movies of concentration profiles from hdf5 files
 """
 
-import sys; sys.path.append('../')
 import utils.file_operations as file_operations
 import utils.simulation_helper as simulation_helper
 import argparse
