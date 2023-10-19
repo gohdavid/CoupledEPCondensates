@@ -14,7 +14,7 @@ stage_parameters()
 
 run_program()
 {
-    source activate fipyenv
+    source activate CoupledEPCondensates
     python run_simulation.py --i $input_file --o $out_folder
     conda deactivate
 }
