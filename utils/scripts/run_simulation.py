@@ -20,15 +20,18 @@ def get_output_dir_name(input_params):
     Returns:
         output_dir (string): Name of the output directory including the important parameter names
     """
+    output_dir = (f"M1_{str(input_params['M1'])}"
+                  f"_beta_{str(input_params['beta_tilde'])}"
+                  f"_gamma_{str(input_params['gamma_tilde'])}"
+                  f"_kappa_{str(input_params['kappa_tilde'])}"
+                  f"_kprod_{str(input_params['k_production'])}"
+                  f"_c1Init_{str(input_params['initial_values'][0])}"
+                  f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
+                  f"_rxnSigma_{str(input_params['reaction_sigma'])}"
+                  f"_loc_{str(input_params['location'][0][0])}"
+                  )
 
-    output_dir = 'M_1_' + str(input_params['M1']) + '_beta_' + str(input_params['beta_tilde']) \
-                 + '_gamma_' + str(input_params['gamma_tilde']) + '_kappa_' + str(input_params['kappa_tilde']) \
-                 + '_K_' + str(input_params['basal_k_production']) \
-                 + '_K_spatial_' + str(input_params['k_production']) \
-                 + '_c_initial_' + str(input_params['initial_values'][0]) + '_noise_variance_' \
-                 + str(input_params['initial_condition_noise_variance'][0]) \
-                 + '_reaction_sigma_' + str(input_params['reaction_sigma']) \
-                 + '_location_' + str(input_params['location'])
+    #  + '_K_' + str(input_params['basal_k_production']) \
     # + '_well_depth_' + str(input_params['well_depth'])
     # + '_reaction_sigma_' + str(input_params['reaction_sigma'])
     return output_dir
