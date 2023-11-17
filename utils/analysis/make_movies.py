@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Main script to generate movies of concentration profiles from hdf5 files
 """
-
 import utils.file_operations as file_operations
 import utils.simulation_helper as simulation_helper
 import argparse
@@ -15,14 +14,14 @@ from matplotlib import pyplot as plt
 from matplotlib import rc
 
 # Suppress any outputs to an interactive interface
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 
 # Add current directory to system path
 
 
 # Settings to make pretty plots using pyplot
-rc('font', **{'family': 'serif', 'serif': ['Times']})
-rc('text', usetex=True)
+# rc('font', **{'family': 'serif', 'serif': ['Times']})
+# rc('text', usetex=True)
 plt.rcParams['xtick.labelsize'] = 20
 plt.rcParams['ytick.labelsize'] = 20
 plt.rcParams['font.size'] = 20
@@ -65,7 +64,7 @@ def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=3
                 min_value = np.min(concentration_profile[i][0])
                 max_value = np.max(concentration_profile[i][0])
                 for t in range(1, concentration_profile[0].shape[0]):
-                    if min_value > np.min(concentration_profile[i][t]):
+                    if min_value > np.min(concentration_profile[i][t]) and np.min(concentration_profile[i][t]) !=0:
                         min_value = np.min(concentration_profile[i][t])
                     if max_value < np.max(concentration_profile[i][t]):
                         max_value = np.max(concentration_profile[i][t])

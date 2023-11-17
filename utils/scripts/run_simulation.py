@@ -9,6 +9,7 @@ import os
 import os.path
 import numpy as np
 from tqdm import tqdm
+import sys
 
 
 def get_output_dir_name(input_params):
@@ -28,6 +29,7 @@ def get_output_dir_name(input_params):
                   f"_c1Init_{str(input_params['initial_values'][0])}"
                   f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
                   f"_rxnSigma_{str(input_params['reaction_sigma'])}"
+                  f"_seed_{str(input_params['seed_value'][0])}"
                   f"_loc_{str(input_params['location'][0][0])}"
                   )
 
@@ -193,6 +195,9 @@ if __name__ == "__main__":
     output_directory = os.path.join(args.o, get_output_dir_name(input_parameters))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
+    elif os.path.exists(output_directory):
+        print("Simulation directory already exists.")
+        sys.exit()
     # Write the input parameters file to the output directory
     file_operations.write_input_params_from_file(input_filename=input_parameter_file,
                                                  target_filename=os.path.join(output_directory, 'input_params.txt'))

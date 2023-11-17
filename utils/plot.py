@@ -4,6 +4,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scienceplots
 
 def rcparams():
     mpl.style.use('default')
@@ -19,7 +20,7 @@ def rcparams():
         'axes.grid': False,
         'axes.spines.right': False,
         'axes.spines.top': False,
-        'font.sans-serif': 'Helvetica',
+        # 'font.sans-serif': 'Helvetica',
         'figure.dpi': 300,
     })
 

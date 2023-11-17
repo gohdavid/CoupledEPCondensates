@@ -17,6 +17,9 @@ ipykernel = "^6.25.2"
 matplotlib = "~3.7"
 jupyterlab = "^4.0.7"
 moviepy = "^1.0.3"
+scienceplots = "^2.1.0"
+opencv-python = "^4.8.1.78"
+scikit-learn = "^1.3.2"
 
 
 [build-system]
