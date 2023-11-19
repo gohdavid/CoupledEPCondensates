@@ -1,3 +1,4 @@
 .DS_Store
 .nfs*
 __pycache__
+run_simulation.slurm

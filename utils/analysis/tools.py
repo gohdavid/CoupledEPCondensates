@@ -58,14 +58,10 @@ class simDir:
         if plot_limits:
             self.getPlotLimits()
 
-    def makeSubdirectory(self, subdirectory: str):
+    def makeSubdirectory(self, subdirectory:str):
         # Make a directory within the simulation directory
         subdir_path = self.directory / subdirectory
-        try:
-            os.mkdir(subdir_path)
-            print("Successfully made the directory " + subdir_path + " ...")
-        except OSError:
-            print(subdir_path + " directory already exists")
+        subdir_path.mkdir(exist_ok=True)
         return subdir_path
 
     def getPlotLimits(self):
@@ -125,8 +121,8 @@ class simDir:
                             )
         cbar.ax.tick_params(labelsize=30)
         fig.suptitle(self.movie_params['titles'][i], fontsize=40)
-        fig.savefig(fname=subdir_path + \
-            '/{}.png'.format(self.movie_params['titles'][i]),
+        fig.savefig(fname=subdir_path /
+            '{}.png'.format(self.movie_params['titles'][i]),
                     dpi=300, format='png')
         return fig
 
