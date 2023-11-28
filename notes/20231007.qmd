@@ -1,0 +1,54 @@
+
+---
+title: Coupled enhancer-promoter condensates
+author: David Goh
+date-format: YYYY-MM-DDTHH:mm:ssZ
+---
+
+
+## Enhancer and promoter
+
+![Enhancer and promoter regions on chromatin](_assets/EnhancerPromoter.png){width=300px}
+
+
+
+## Free energy functional
+\newcommand{\conc}[1]{\phi_\mathrm{#1}}
+
+
+$$
+\begin{aligned}
+F(\conc{P}(\vec{x},t),\conc{R}(\vec{x},t))
+&=\int \mathrm{d}\vec x\rho_\mathrm{P}(\conc{P}-\alpha)^2(\conc{P}-\beta)^2\\
+&+\rho_\mathrm{R}\conc{R}^2\\
+&-\chi \conc{P}\conc{R}+c \conc{P}^2\conc{R}^2\\
+&+\frac{\kappa}{2}|\nabla \conc{P}|^2\\
+&-\chi_\mathrm{PD}\conc{P}\exp\left\{-\frac{(\vec{x}-\vec{x_e})^2}{2\sigma^2}\right\}\\
+&+F_C
+\end{aligned}
+$$
+
+- Protein-protein double-well potential
+$$F_\mathrm{DW}=\rho_\mathrm{P}(\conc{P}-\alpha)^2(\conc{P}-\beta)^2$$
+- RNA-RNA repulsion
+$$\rho_\mathrm{R}\conc{R}^2$$
+- Protein-RNA electrostatic interaction
+$$\chi_\mathrm{PR}(\conc{P},\conc{R})=\chi \conc{P}\conc{R}+c \conc{P}^2\conc{R}^2$$
+- Protein-DNA interaction
+$$\chi_\mathrm{PD}\conc{P}\conc{D}=\chi_\mathrm{PD}\conc{P}\exp\left\{-\frac{(\vec{x}-\vec{x_e})^2}{2\sigma^2}\right\}$$
+- Interfacial surface-tension
+$$\frac{\kappa}{2}|\nabla \conc{P}|^2$$
+- Chromatin
+$$F(\vec R)=\frac{3k_B T}{2}\left(\frac{|\vec R|^2}{L_CL_P}\right)$$
+
+## Dynamic equations
+
+- Protein dynamics
+Model A dynamics. The amount of protein is conserved.
+$$\frac{\partial \conc{P}}{\partial t}=M_\mathrm{P}\nabla^2\left(\frac{\partial F}{\partial \conc{P}}\right)=M_\mathrm{P}\nabla^2\mu_\mathrm{P}$$
+- RNA dynamics
+$$\frac{\partial \conc{R}}{\partial t}=M_\mathrm{R}\nabla^2\conc{R}+k_p(\vec{x})\conc{P}-k_d\conc{R}$$
+$$k_p(\vec{x})=\frac{k_T}{2\pi\sigma^2}\exp\left[\frac{(\vec{x}-\vec{x_p})^2}{2\sigma^2}\right]$$
+- Enhancer region dynamics
+    - Gradient of free energy functional with respect to the vector $\vec{x}_e$
+$$\frac{\partial \vec{x}_\mathrm{e}}{\partial t}=M_\mathrm{D}\nabla_{\vec{x}_e} F$$

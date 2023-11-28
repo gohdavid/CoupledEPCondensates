@@ -1,0 +1,17 @@
+project:
+  output-dir: _output
+
+toc: true
+number-sections: true
+bibliography: _assets/references.bib  
+
+format:
+  pdf:
+      geometry:
+          - top=20mm
+          - left=20mm
+          - bottom=20mm
+          - right=20mm
+      link-citations: true
+
+fig-align: center

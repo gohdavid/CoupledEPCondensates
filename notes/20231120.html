@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="quarto-1.3.450" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+
+<title>Coupled enhancer-promoter condensates</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+<!-- htmldependencies:E3FAD763 -->
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <div id="quarto-toc-target"></div>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Coupled enhancer-promoter condensates</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#asymmetric-natcomms-dimensional" id="toc-asymmetric-natcomms-dimensional"><span class="header-section-number">1</span> Asymmetric NatComms Dimensional</a></li>
+  <li><a href="#symmetric-pfstability-dimensional" id="toc-symmetric-pfstability-dimensional"><span class="header-section-number">2</span> Symmetric PFStability Dimensional</a></li>
+  <li><a href="#symmetric-pfstability-non-dimensional" id="toc-symmetric-pfstability-non-dimensional"><span class="header-section-number">3</span> Symmetric PFStability Non-Dimensional</a></li>
+  <li><a href="#symmetric-binodal" id="toc-symmetric-binodal"><span class="header-section-number">4</span> Symmetric Binodal</a></li>
+  <li><a href="#dimensional-conversion" id="toc-dimensional-conversion"><span class="header-section-number">5</span> Dimensional conversion</a></li>
+  <li><a href="#non-dimensional-conversion" id="toc-non-dimensional-conversion"><span class="header-section-number">6</span> Non-dimensional conversion</a></li>
+  <li><a href="#enhancer-dynamics" id="toc-enhancer-dynamics"><span class="header-section-number">7</span> Enhancer dynamics</a></li>
+  <li><a href="#proteinrna-coupled-dynamics" id="toc-proteinrna-coupled-dynamics"><span class="header-section-number">8</span> Protein/RNA Coupled Dynamics</a></li>
+  <li><a href="#section" id="toc-section"><span class="header-section-number">9</span> </a></li>
+  </ul>
+</nav>
+<section id="asymmetric-natcomms-dimensional" class="level2" data-number="1">
+<h2 data-number="1"><span class="header-section-number">1</span> Asymmetric NatComms Dimensional</h2>
+<p><span class="math display">\[F_{DW}(\rho_p , a , b)+\cdots = \int d^2x \bigg[\rho_p (\phi_p -a)^2(\phi_p -b)^2-\chi \phi_p \phi_r+c \phi_p^2 \phi_r^2+\rho_r\phi_r^2+\frac{\kappa}{2}(\nabla\phi_p)^2\bigg]\]</span></p>
+<p>With <span class="math inline">\(a&lt;b\)</span>, <span class="math inline">\(a =0.1\)</span>, <span class="math inline">\(b = 0.7\)</span>, <span class="math inline">\(\phi_{p,+}=0.63\)</span>, <span class="math inline">\(\phi_{p,-}=0.13\)</span>, and <span class="math inline">\(\rho_p = 1\)</span>.</p>
+</section>
+<section id="symmetric-pfstability-dimensional" class="level2" data-number="2">
+<h2 data-number="2"><span class="header-section-number">2</span> Symmetric PFStability Dimensional</h2>
+<p><span class="math display">\[\begin{aligned}
+F_{DW}(c_0 , \alpha, \beta)+\cdots &amp;= \int d^2x \bigg[\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2+\frac{\lambda}{2}m^2 +\gamma m c\\
+&amp;+\frac{\kappa}{2}(\nabla c)^2- \chi_{PD} \exp (- |\vec r - \vec r_e |^2/2 \sigma^2) c \bigg]+ \frac{3k_B T}{2L_CL_P}|\vec r_e - \vec r_p|^2
+\end{aligned}\]</span></p>
+</section>
+<section id="symmetric-pfstability-non-dimensional" class="level2" data-number="3">
+<h2 data-number="3"><span class="header-section-number">3</span> Symmetric PFStability Non-Dimensional</h2>
+<p><span class="math display">\[\tilde F_{DW}(\bar c_1, \tilde \beta) +\cdots= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2-\tilde c \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|\]</span></p>
+</section>
+<section id="symmetric-binodal" class="level2" data-number="4">
+<h2 data-number="4"><span class="header-section-number">4</span> Symmetric Binodal</h2>
+<p><span class="math display">\[\begin{aligned}
+\frac{\partial}{\partial c}\left[\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2\right]&amp;=0\\
+\alpha(c-c_0)^3+\beta (c-c_0)&amp;=0\\
+\alpha (c-c_0)\left(c-c_0+\sqrt{-\beta/\alpha}\right)\left(c-c_0-\sqrt{-\beta/\alpha}\right)&amp;=0
+\end{aligned}\]</span> <span class="math display">\[c = c_0 \pm \sqrt{-\beta/\alpha}\]</span></p>
+</section>
+<section id="dimensional-conversion" class="level2" data-number="5">
+<h2 data-number="5"><span class="header-section-number">5</span> Dimensional conversion</h2>
+<p><span class="math display">\[\begin{aligned}
+\rho_p (\phi_p -a)^2(\phi_p -b)^2&amp;= \rho_p (\phi_p^2 - 2a \phi_p+a^2)(\phi_p^2 - 2b \phi_p+b^2)\\
+&amp;=\rho_p (\phi_p^4 +(-2a -2 b)\phi_p ^3+(a^2 + b^2 +4ab)\phi_p^2 \\
+&amp;+(-2a^2 b -2a b^2)\phi_p+a^2b^2)\\
+&amp;=\rho_p\phi_p^4 +\rho_p(-2a -2 b)\phi_p ^3+\rho_p(a^2 + b^2 +4ab)\phi_p^2 \\
+&amp;+\rho_p(-2a^2 b -2a b^2)\phi_p+\rho_pa^2b^2\\
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2&amp; = \frac{\alpha}{4}(c^4-4c_0c^3+6c_0^2c^2-4c_0^3c+c_0^4)+ \frac{\beta}{2}(c^2 - 2c_0c+c_0^2)\\
+&amp; = \left(\frac{\alpha}{4}\right)c^4 +\left(-\alpha c_0 \right)c^3 + \left(\frac{3}{2}\alpha c_0^2+\frac{\beta}{2}\right)c^2\\
+&amp;+\left(-\alpha c_0^3 -\beta c_0 \right)c + \left(\frac{\alpha}{4}c_0^4+\frac{\beta}{2}c_0^2\right)
+\end{aligned}\]</span></p>
+<p><span id="eq-match1"><span class="math display">\[\rho_p= \frac{\alpha}{4} \tag{1}\]</span></span> <span id="eq-match2"><span class="math display">\[\rho_p (-2a -2b)= -\alpha c_0 \tag{2}\]</span></span> <span id="eq-match3"><span class="math display">\[\rho_p(a^2 + b^2 +4ab)=\frac{3}{2}\alpha c_0^2+\frac{\beta}{2} \tag{3}\]</span></span> <span id="eq-match4"><span class="math display">\[\rho_p(-2a^2 b -2a b^2) = \left(-\alpha c_0^3 -\beta c_0 \right) \tag{4}\]</span></span> <!-- $$-\rho_p 2ab(a+b)=-c_0 (\alpha c_0^2+\beta)$$ --> <span id="eq-match5"><span class="math display">\[\rho_pa^2b^2=\left(\frac{\alpha}{4}c_0^4+\frac{\beta}{2}c_0^2\right) \tag{5}\]</span></span></p>
+<p>Substitute <a href="#eq-match1">Equation 1</a> to <a href="#eq-match2">Equation 2</a>. <span class="math display">\[\frac{\alpha}{4}(-2a-2b)=-\alpha c_0\]</span> <span id="eq-c0"><span class="math display">\[c_0 = \frac{a+b}{2} \tag{6}\]</span></span> Substitute <a href="#eq-c0">Equation 6</a> to <a href="#eq-match4">Equation 4</a>. <span class="math display">\[\rho_p 2ab(a+b)=\frac{a+b}{2} \left[\alpha \left(\frac{a+b}{2}\right)^2 + \beta\right]\]</span></p>
+<p><span id="eq-from64"><span class="math display">\[16\rho_p ab=\alpha (a^2+2ab+b^2) + 4\beta \tag{7}\]</span></span> Substitute <a href="#eq-from64">Equation 7</a> to <a href="#eq-match3">Equation 3</a> <span class="math display">\[\rho_p(a^2 + b^2 +4ab)=\frac{3}{2}\alpha \left(\frac{a+b}{2}\right)^2+\frac{\beta}{2}\]</span></p>
+<p><span id="eq-from643"><span class="math display">\[8\rho_p(a^2 + b^2 +4ab)=3\alpha \left(a^2+2ab+b^2\right)+4\beta \tag{8}\]</span></span></p>
+<p>Subtract <a href="#eq-from64">Equation 7</a> and <a href="#eq-from643">Equation 8</a>.</p>
+<p><span class="math display">\[8 \rho_pa^2 + 8 \rho_p b^2 +16 \rho_p ab=2\alpha (a^2 + 2ab + b^2)\]</span></p>
+<p><span class="math display">\[\alpha =\frac{8 \rho_pa^2 + 8 \rho_p b^2 +16 \rho_p ab}{2(a^2 + 2ab + b^2)}=\frac{8\rho_p (a+b)^2}{2(a+b)^2}= 4\rho_p \]</span></p>
+<p>This is consistent with <a href="#eq-match1">Equation 1</a>. Substitute to <a href="#eq-from64">Equation 7</a>.</p>
+<p><span class="math display">\[16\rho_p ab=4 \rho_p (a^2+2ab+b^2) + 4\beta\]</span></p>
+<p><span class="math display">\[-4 \rho_p (a^2-2ab+b^2)= 4\beta\]</span></p>
+<p><span id="eq-beta"><span class="math display">\[\beta=-\rho_p (a-b)^2 \tag{9}\]</span></span> We have used <a href="#eq-match1">Equation 1</a>, <a href="#eq-match2">Equation 2</a>, <a href="#eq-match4">Equation 4</a>. Check with <a href="#eq-match3">Equation 3</a>, <a href="#eq-match5">Equation 5</a>.</p>
+<p>For <a href="#eq-match3">Equation 3</a>: <span class="math display">\[LHS=\rho_p(a^2 + b^2 +4ab)\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+RHS&amp;=\frac{3}{2}\alpha c_0^2+\frac{\beta}{2} = \frac{3}{2}(4 \rho_p )\left(\frac{a+b}{2}\right)^2-\frac{\rho_p (a-b)^2}{2}\\
+&amp;=\frac{3}{2}\rho_p (a+b)^2-\frac{\rho_p}{2} (a-b)^2=\rho_p (a^2+4ab+b^2)
+\end{aligned}\]</span></p>
+<p><span class="math inline">\(LHS=RHS\)</span> consistent with <a href="#eq-match3">Equation 3</a>.</p>
+<p>For <a href="#eq-match5">Equation 5</a>: <span class="math display">\[LHS=\rho_pa^2b^2\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+RHS&amp;=\left(\frac{\alpha}{4}c_0^4+\frac{\beta}{2}c_0^2\right)= \rho_p \frac{(a+b)^4}{16}-\frac{\rho_p}{2}(a-b)^2\frac{(a+b)^2}{4}\\
+&amp; = \frac{\rho_p}{16} (a+b)^2\left[(a+b)^2-2(a-b)^2\right]
+\end{aligned}\]</span></p>
+<p><span class="math display">\[LHS \neq RHS\]</span></p>
+<p>Equations differ by a scalar, which is not important in free energy gradients.</p>
+<p><span class="math display">\[LHS-RHS = \rho_p \left[a^2b^2 - \frac{1}{16} (a+b)^2\left\{(a+b)^2-2(a-b)^2\right\}\right]\]</span></p>
+<p>Hence, <span class="math display">\[\begin{cases}
+\alpha = 4 \rho_p\\
+\beta = -\rho_p (a-b)^2\\
+c_0 = 0.5(a+b)
+\end{cases}\]</span></p>
+<p>Likewise, <span class="math display">\[\begin{cases}
+\rho_p = 0.25 \alpha\\
+a =c_0 - \sqrt{-\beta/\alpha}\\
+b = c_0 + \sqrt{-\beta/\alpha}
+\end{cases}\]</span></p>
+</section>
+<section id="non-dimensional-conversion" class="level2" data-number="6">
+<h2 data-number="6"><span class="header-section-number">6</span> Non-dimensional conversion</h2>
+<p>Use the following characteristic scales <span class="math display">\[[C]=(c_0/\bar c)\]</span> <span class="math display">\[[T]=\frac{1}{k_d}\]</span> <span class="math display">\[[L]=\sqrt{M_m\lambda/k_d}\]</span> <span class="math display">\[[E]=[\alpha][C]^4[L^2]\]</span></p>
+<p>This is a functional derivative</p>
+<p><span class="math display">\[\partial_t c=M_c\nabla^2\left(\frac{\delta F}{\delta c}\right)=M_c\nabla^2\left(\alpha (c-c_0)^3 + \beta (c-c_0)+ \gamma m -k \nabla^2 c\right)\]</span> <span class="math display">\[\partial_t m=M_m\lambda\nabla^2 m+k_p(\vec{r})c-k_dm\]</span></p>
+<p><span class="math display">\[\begin{aligned}\tilde c &amp;= \frac{c}{c_0/\bar c}&amp;
+\tilde m &amp;= \frac{m}{c_0/\bar c}&amp;
+\tilde t  &amp;= k_d t&amp;
+k  &amp;= \frac{k_p}{k_d}&amp;
+\tilde{r} &amp;= \frac{r}{l_{\text{RNA}}}=\frac{r}{\sqrt{M_m \lambda/k_d}}
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde c=\frac{M_c}{k_d}\nabla^2\left(\alpha (c_0/\bar c)^2(\tilde c-\bar c)^3 + \beta (\tilde c-\bar c)+ \gamma \tilde m -\kappa \nabla^2 \tilde c\right)\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde c=\frac{M_c\alpha (c_0/\bar c)^2}{M_m \lambda}\tilde \nabla^2\left((\tilde c-\bar c)^3 + \beta\frac{1}{\alpha (c_0/\bar c)^2} (\tilde c-\bar c)+ \gamma\frac{1}{\alpha (c_0/\bar c)^2} \tilde m -\kappa \frac{1}{\alpha (c_0/\bar c)^2 } \frac{k_d}{M_m}\tilde \nabla^2 \tilde c\right)\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde c=M\tilde \nabla^2\left((\tilde c-\bar c)^3 +\tilde \beta (\tilde c-\bar c)+ \tilde \gamma \tilde m - \tilde \kappa \nabla^2 \tilde c\right)\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+M &amp;= \frac{M_c\alpha (c_0/\bar c)^2}{M_m \lambda}&amp;
+\tilde \beta &amp;= \beta\frac{1}{\alpha (c_0/\bar c)^2}&amp;
+\tilde \gamma &amp;= \gamma\frac{1}{\alpha (c_0/\bar c)^2}&amp;
+\tilde \kappa &amp;= \frac{\kappa }{\alpha (c_0/\bar c)^2}\frac{k_d}{M_m}
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde m=\frac{M_m\lambda}{k_d}\tilde \nabla^2 \tilde m+k\tilde c-\tilde m\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde m=\tilde \nabla^2 \tilde m+k\tilde c-\tilde m\]</span></p>
+<!-- $$\begin{aligned}
+F&=\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2\\
+\frac{F}{\alpha}&= \frac{1}{4}(c-c_0)^4+\frac{1}{2}\frac{\beta}{\alpha}(c-c_0)^2\\
+F&=C^4\left[\frac{1}{4}\left(\frac{c}{C}-\frac{c_0}{C}\right)^4+\frac{1}{2}\frac{1}{C^2}\frac{\beta}{\alpha}\left(\frac{c}{C}-\frac{c_0}{C}\right)^2\right]\\
+\frac{F}{C^4}&=\left[\frac{1}{4}\left(\frac{c}{C}-\frac{c_0}{C}\right)^4+\frac{1}{2}\frac{\beta}{C^2\alpha}\left(\frac{c}{C}-\frac{c_0}{C}\right)^2\right]
+\end{aligned}$$
+
+
+Hence, 
+$$\tilde c_1 = \frac{a+b}{2C}$$
+$$\tilde \beta =\frac{-(a-b)^2}{4C^2}$$ -->
+</section>
+<section id="enhancer-dynamics" class="level2" data-number="7">
+<h2 data-number="7"><span class="header-section-number">7</span> Enhancer dynamics</h2>
+<p>Notice the change in notation from the dimensional to dimensionless equation. I’m shifting the notation form Pradeep’s notes to the documentation in the PFStability code.</p>
+<p><span class="math display">\[\begin{aligned}
+F_{DW}(c_0 , \alpha, \beta) &amp;= \int d^2x \bigg[\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2+\frac{\lambda}{2}m^2 +\gamma m c\\
+&amp;+\frac{\kappa}{2}(\nabla c)^2- \chi_{PD} \exp (- |\vec r - \vec r_e |^2/2 \sigma^2) c \bigg]+ \frac{3k_B T}{2L_CL_P}|\vec r_e - \vec r_p|^2
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+\tilde F(\tilde c_1,\tilde c_2,\vec r_e)&amp;=\frac{F}{\alpha (c_0/\bar c)^4 (M_m\lambda/k_d)}= \int d^2{\tilde x} \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2\\
+&amp;-\tilde c \exp (- |\vec r - \vec r_e |^2/2 \sigma^2)\tilde c_1 \bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|^2
+\end{aligned}\]</span></p>
+<p>Recall our characteristic concentration, time, length, and energy scales. Note that <span class="math inline">\(\bar c\)</span> is dimensionless. <span class="math display">\[[\bar c]=1\]</span> <span class="math display">\[[C]=(c_0/\bar c)\]</span> <span class="math display">\[[T]=\frac{1}{k_d}\]</span> <span class="math display">\[[L]=\sqrt{M_m\lambda/k_d}\]</span> <span class="math display">\[[E]=[\alpha][C]^4[L^2]\]</span></p>
+<p><span class="math display">\[F =  [E]\tilde F = \alpha (c_0/\bar c)^4 (M_m\lambda/k_d) \tilde F\]</span></p>
+<p><span class="math display">\[[\chi_{PD}]=\frac{[E]}{[L]^2[C]}=[\alpha][C^3]=\alpha(c_0/\bar c)^3\]</span></p>
+<p><span class="math display">\[\chi_{PD}=[\chi_{PD}]\tilde c=\alpha(c_0/\bar c)^3\tilde c\]</span></p>
+<p><span class="math display">\[[M_D]=\frac{[\partial_{\vec r_e}]}{[\nabla _{\vec x_e}F]}=\frac{[L]/[T]}{[E]/[L]}=\frac{[L]^2}{[E][T]}=\frac{[L]^2}{[\alpha][C]^4[L^2][T]}=\frac{1}{[\alpha][C]^4[T]}= \frac{k_d}{\alpha (c_0/\bar c)^4}\]</span></p>
+<p><span class="math display">\[M_D = [M_D] \tilde M_D = \frac{k_d}{\alpha (c_0/\bar c)^4} \tilde M_D\]</span></p>
+<p>This is a partial derivative (gradient) <span class="math display">\[\partial_t\vec r_e=-M_D\vec \nabla_{\vec r_e}F=M_D \int d^2 x \left[\chi_{PD}c_1\left(\frac{\vec r - \vec r_e}{\sigma^2}\right)\exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right)\right]- M_D \frac{3 k_B T}{L_P L_C} (\vec r_e - \vec r_p)\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+k_d\left(\sqrt{M_m\lambda/k_d}\right)\partial_{\tilde t}{\vec {\tilde r_e}} &amp;= M_D \int d^2 {\tilde x} (M_m\lambda/k_d) \bigg[\chi_{PD}c_1\bigg(\frac{1}{\sqrt{M_m\lambda/k_d}}\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\bigg)\exp \bigg(- \frac{|\vec {\tilde r}-\vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\bigg)\bigg]\\
+&amp;- M_D  \frac{3 k_B T}{L_P  L_C}  \left( \sqrt{M_m\lambda/k_d}\right) (\vec {\tilde r_e} - \vec {\tilde r_p})
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t}{\vec {\tilde r_e}} = \frac{M_D}{k_d} \int d^2 {\tilde x} \left[\chi_{PD}c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \frac{M_D}{k_d} \frac{3 k_B T}{ L_PL_C}  (\vec {\tilde r_e} - \vec {\tilde r_p})\]</span></p>
+<p><span class="math display">\[\begin{aligned}
+\partial_{\tilde t}{\vec {\tilde r_e}} &amp;= \left\{\frac{M_D \alpha (c_0/\bar c)^4}{k_d}\right\} \int d^2 {\tilde x} \left[ \left\{\frac{\chi_{PD}}{\alpha (c_0/\bar c)^3}\right\} \left\{\frac{c_1}{(c_0/\bar c)}\right\}\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]\\
+&amp;-  \left\{\frac{M_D  \alpha (c_0/\bar c)^4}{k_d}\right\}  \left\{\frac{3 k_B T}{ L_PL_C }\frac{1}{\alpha (c_0/\bar c)^4}\right\}  (\vec {\tilde r_e} - \vec {\tilde r_p})
+\end{aligned}\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t}{\vec {\tilde r_e}} =  \tilde M_D \int d^2 {\tilde x} \left[\tilde c\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \tilde M_D  \tilde k  (\vec {\tilde r_e} - \vec {\tilde r_p})\]</span></p>
+<p><span class="math display">\[\tilde M_D = \frac{M_D \alpha (c_0/\bar c)^4}{k_d}\]</span> <span class="math display">\[\tilde k = \frac{3 k_B T}{L_PL_C }\frac{1}{\alpha (c_0/\bar c)^4}\]</span> <span class="math display">\[\tilde c = \frac{\chi_{PD}}{\alpha (c_0/\bar c)^3}\]</span></p>
+</section>
+<section id="proteinrna-coupled-dynamics" class="level2" data-number="8">
+<h2 data-number="8"><span class="header-section-number">8</span> Protein/RNA Coupled Dynamics</h2>
+<p><span class="math display">\[\tilde F_{DW}(\bar c_1, \tilde \beta) +\cdots= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2-\tilde c \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|\]</span></p>
+<p><span class="math display">\[\partial_{\tilde t} \tilde c_1=M\tilde \nabla^2\left((\tilde c_1-\bar c)^3 +\tilde \beta (\tilde c_1-\bar c)+ \tilde \gamma \tilde c_2 - \tilde \kappa \nabla^2 \tilde c_1-\exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\right)\]</span> <span class="math display">\[\partial_{\tilde t} \tilde c_2=\tilde \nabla^2 \tilde c_2+k\tilde c_1-\tilde c_2\]</span></p>
+</section>
+<section id="section" class="level2" data-number="9">
+<h2 data-number="9"><span class="header-section-number">9</span> </h2>
+<p><span class="math display">\[\frac{\delta F_{G}}{\delta \vec x_e}=-M_D \int d^2 x \left[\chi_{PD}c_1 \vec \nabla_{\vec x_e}\exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right)\right]=-M_D \oint dS \chi_{PD}c_1 \exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right)+ M_D \int d^2 x \exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right) \nabla_{\vec x_e}(\chi_{PD} c_1)\]</span></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id = "quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+</body>
+
+</html>
