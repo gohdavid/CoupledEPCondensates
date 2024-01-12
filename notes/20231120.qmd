@@ -6,12 +6,12 @@ preview:
     port: 4200
     browser: false
 ---
-## Asymmetric NatComms Dimensional
+## Dimensional Asymmetric Double-Well
 $$F_{DW}(\rho_p , a , b)+\cdots = \int d^2x \bigg[\rho_p (\phi_p -a)^2(\phi_p -b)^2-\chi \phi_p \phi_r+c \phi_p^2 \phi_r^2+\rho_r\phi_r^2+\frac{\kappa}{2}(\nabla\phi_p)^2\bigg]$$
 
 With $a<b$, $a =0.1$, $b = 0.7$, $\phi_{p,+}=0.63$, $\phi_{p,-}=0.13$, and $\rho_p = 1$.
 
-## Symmetric PFStability Dimensional
+## Dimensional Symmetric Double-Well
 $$\begin{aligned}
 F_{DW}(c_0 , \alpha, \beta)+\cdots &= \int d^2x \bigg[\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2+\frac{\lambda}{2}m^2 +\gamma m c\\
 &+\frac{\kappa}{2}(\nabla c)^2- \chi_{PD} \exp (- |\vec r - \vec r_e |^2/2 \sigma^2) c \bigg]+ \frac{3k_B T}{2L_CL_P}|\vec r_e - \vec r_p|^2
@@ -19,9 +19,9 @@ F_{DW}(c_0 , \alpha, \beta)+\cdots &= \int d^2x \bigg[\frac{\alpha}{4}(c-c_0)^4+
 
 
 ##  Symmetric PFStability Non-Dimensional
-$$\tilde F_{DW}(\bar c_1, \tilde \beta) +\cdots= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2-\tilde c \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|$$
+$$\tilde F_{DW}(\bar c_1, \tilde \beta) +\cdots= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2-\tilde \chi_{PD} \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|$$
 
-## Symmetric Binodal
+## Symmetric Binodal Points
 
 $$\begin{aligned}
 \frac{\partial}{\partial c}\left[\frac{\alpha}{4}(c-c_0)^4+\frac{\beta}{2}(c-c_0)^2\right]&=0\\
@@ -30,7 +30,7 @@ $$\begin{aligned}
 \end{aligned}$$
 $$c = c_0 \pm \sqrt{-\beta/\alpha}$$
 
-## Dimensional conversion 
+## Asymmetric-Symmetric Conversion (Dimensional)
 
 $$\begin{aligned}
 \rho_p (\phi_p -a)^2(\phi_p -b)^2&= \rho_p (\phi_p^2 - 2a \phi_p+a^2)(\phi_p^2 - 2b \phi_p+b^2)\\
@@ -119,12 +119,15 @@ a =c_0 - \sqrt{-\beta/\alpha}\\
 b = c_0 + \sqrt{-\beta/\alpha}
 \end{cases}$$
 
-## Non-dimensional conversion
+## Non-dimensionalize Symmetric Double-Well
 Use the following characteristic scales
-$$[C]=(c_0/\bar c)$$
-$$[T]=\frac{1}{k_d}$$
-$$[L]=\sqrt{M_m\lambda/k_d}$$
-$$[E]=[\alpha][C]^4[L^2]$$
+$$\begin{aligned}\
+[C]&=(c_0/\bar c)&
+[T]&=\frac{1}{k_d}&
+[L]&=\sqrt{M_m\lambda/k_d}&
+[E]&=[\alpha][C]^4[L^2]&
+\end{aligned}$$
+
 
 This is a functional derivative
 
@@ -171,7 +174,7 @@ $$\tilde \beta =\frac{-(a-b)^2}{4C^2}$$ -->
 
 
 
-## Enhancer dynamics
+## Dimensionless Enhancer Dynamics
 
 Notice the change in notation from the dimensional to dimensionless equation. I'm shifting the notation form Pradeep's notes to the documentation in the PFStability code.
 
@@ -181,16 +184,16 @@ F_{DW}(c_0 , \alpha, \beta) &= \int d^2x \bigg[\frac{\alpha}{4}(c-c_0)^4+\frac{\
 \end{aligned}$$
 
 $$\begin{aligned}
-\tilde F(\tilde c_1,\tilde c_2,\vec r_e)&=\frac{F}{\alpha (c_0/\bar c)^4 (M_m\lambda/k_d)}= \int d^2{\tilde x} \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2\\
-&-\tilde c \exp (- |\vec r - \vec r_e |^2/2 \sigma^2)\tilde c_1 \bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|^2
+\tilde F(\tilde c_1,\tilde c_2,\vec r_e)&=\frac{F}{\alpha (c_0/\bar c)^4 (M_m\lambda/k_d)}= \int d^2{\tilde x} \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}\tilde c_2^2 +\tilde \gamma \tilde c_1 \tilde c_2+\frac{\tilde \kappa}{2}|\tilde \nabla \tilde c_1|^2\\
+&-\tilde \chi_{PD} \exp (- |\vec {\tilde r} - \vec {\tilde r_e} |^2/2 \tilde \sigma^2)\tilde c_1 \bigg]+ \frac{\tilde k}{2}|\vec {\tilde r_e} - \vec {\tilde r_p}|^2
 \end{aligned}$$
 
 Recall our characteristic concentration, time, length, and energy scales. Note that $\bar c$ is dimensionless.
-$$[\bar c]=1$$
-$$[C]=(c_0/\bar c)$$
-$$[T]=\frac{1}{k_d}$$
-$$[L]=\sqrt{M_m\lambda/k_d}$$
-$$[E]=[\alpha][C]^4[L^2]$$
+$$\begin{aligned}\ [\bar c]&=1&
+[C]&=(c_0/\bar c)&
+[T]&=\frac{1}{k_d}&
+[L]&=\sqrt{M_m\lambda/k_d}&
+[E]&=[\alpha][C]^4[L^2] \end{aligned}$$
 
 $$F =  [E]\tilde F = \alpha (c_0/\bar c)^4 (M_m\lambda/k_d) \tilde F$$
 
@@ -220,19 +223,37 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-$$\partial_{\tilde t}{\vec {\tilde r_e}} =  \tilde M_D \int d^2 {\tilde x} \left[\tilde c\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \tilde M_D  \tilde k  (\vec {\tilde r_e} - \vec {\tilde r_p})$$
+$$\partial_{\tilde t}{\vec {\tilde r_e}} =  \tilde M_D \int d^2 {\tilde x} \left[\tilde \chi_{PD}\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \tilde M_D  \tilde k  (\vec {\tilde r_e} - \vec {\tilde r_p})$$
 
-$$\tilde M_D = \frac{M_D \alpha (c_0/\bar c)^4}{k_d}$$
-$$\tilde k = \frac{3 k_B T}{L_PL_C }\frac{1}{\alpha (c_0/\bar c)^4}$$
-$$\tilde c = \frac{\chi_{PD}}{\alpha (c_0/\bar c)^3}$$
+$$\begin{aligned}
+\tilde M_D &= \frac{M_D \alpha (c_0/\bar c)^4}{k_d}&
+\tilde k &= \frac{3 k_B T}{L_PL_C }\frac{1}{\alpha (c_0/\bar c)^4}&
+\tilde c &= \frac{\chi_{PD}}{\alpha (c_0/\bar c)^3}&
+\end{aligned}$$
 
 
 ## Protein/RNA Coupled Dynamics
-$$\tilde F_{DW}(\bar c_1, \tilde \beta) +\cdots= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \kappa}{2}|\nabla c_1|^2-\tilde c \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|$$
+$$\tilde F= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}{\tilde c_2}^2 +\tilde \gamma \tilde c_1 \tilde c_2+\frac{\tilde \kappa}{2}|\tilde \nabla \tilde c_1|^2-\tilde \chi_{PD} \exp (- |\vec {\tilde r} - \vec {\tilde r_0} |^2/2 {\tilde \sigma}^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec {\tilde r_e} - \vec {\tilde r_p}- \vec {\tilde l}|$$
 
-$$\partial_{\tilde t} \tilde c_1=M\tilde \nabla^2\left((\tilde c_1-\bar c)^3 +\tilde \beta (\tilde c_1-\bar c)+ \tilde \gamma \tilde c_2 - \tilde \kappa \nabla^2 \tilde c_1-\exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\right)$$
+$$\partial_{\tilde t} \tilde c_1=M\tilde \nabla^2\left((\tilde c_1-\bar c)^3 +\tilde \beta (\tilde c_1-\bar c)+ \tilde \gamma \tilde c_2 - \tilde \kappa \nabla^2 \tilde c_1-\tilde \chi_{PD}\exp (- |\vec {\tilde r} - \vec {\tilde r_0} |^2/2 {\tilde \sigma}^2)\right)$$
+$$\partial_{\tilde t} \tilde c_2=\tilde \nabla^2 \tilde c_2+k\tilde c_1-\tilde c_2$$
+$$\partial_{\tilde t}{\vec {\tilde r_e}} =  \tilde M_D \int d^2 {\tilde x} \left[\tilde \chi_{PD}\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \tilde M_D  \tilde k  (\vec {\tilde r_e} - \vec {\tilde r_p}- \vec {\tilde l})$$
+
+## Protein-Enhancer Coupling Steady State
+
+$$0 =  \tilde M_D \int d^2 {\tilde x} \left[\tilde \chi_{PD}\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]- \tilde M_D  \tilde k  (\vec {\tilde r_e} - \vec {\tilde r_p}- \vec {\tilde l})$$
+$$\frac{\tilde k}{\tilde \chi_{PD}} = \frac{ \displaystyle \int d^2 {\tilde x} \left[\tilde c_1\left(\frac{\vec {\tilde r} - \vec {\tilde r_e}}{{\tilde \sigma}^2}\right)\exp \left(- \frac{|\vec {\tilde r} - \vec {\tilde r_e}|^2}{2 {\tilde \sigma}^2}\right)\right]}{(\vec {\tilde r_e} - \vec {\tilde r_p}- \vec {\tilde l})}$$
+
+![](_assets/SharpInterfaceEnhancer.png){width=300}
+
+
+## Re-entrant term
+$$\tilde F= \int d^2x \bigg[\frac{1}{4}(\tilde c_1-\bar c_1)^4+\frac{\tilde \beta}{2}(\tilde c_1-\bar c_1)^2+\frac{\tilde \lambda}{2}c_2^2 +\tilde \gamma c_1 c_2+\frac{\tilde \chi_{PR}}{2} c_1^2c_2^2+\frac{\tilde \kappa}{2}|\tilde \nabla c_1|^2-\tilde \chi_{PD} \exp (- |\vec r - \vec r_0 |^2/2 \sigma^2)\tilde c_1\bigg]+ \frac{\tilde k}{2}|\vec r_e - \vec r_p|$$
+
+$$\partial_{\tilde t} \tilde c_1=M\tilde \nabla^2\left((\tilde c_1-\bar c)^3 +\tilde \beta (\tilde c_1-\bar c)+ \tilde \gamma \tilde c_2 + \tilde \chi_{PR} c_1c_2^2 - \tilde \kappa \tilde \nabla^2 \tilde c_1 - \tilde \chi_{PD}\exp (- |\vec {\tilde r} - \vec {\tilde r_0} |^2/2 {\tilde \sigma}^2)\right)$$
+
 $$\partial_{\tilde t} \tilde c_2=\tilde \nabla^2 \tilde c_2+k\tilde c_1-\tilde c_2$$
 
-## 
+$$J = \begin{bmatrix}\partial_{c_1^2}F & \partial_{c_1c_2}F\\ \partial_{c_2c_1}F & \partial_{c_2^2}F\end{bmatrix}$$
 
-$$\frac{\delta F_{G}}{\delta \vec x_e}=-M_D \int d^2 x \left[\chi_{PD}c_1 \vec \nabla_{\vec x_e}\exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right)\right]=-M_D \oint dS \chi_{PD}c_1 \exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right)+ M_D \int d^2 x \exp \left(- \frac{|\vec r - \vec r_e|^2}{2 \sigma^2}\right) \nabla_{\vec x_e}(\chi_{PD} c_1)$$
+$$J = \begin{bmatrix}3(\tilde c_1 - \bar c)^2+\beta+\tilde \chi_{PR}c_2^2 & \tilde \gamma + 2 \tilde \chi_{PR} c_1 c_2\\ \tilde \gamma + 2\tilde \chi_{PR} c_1 c_2 & \tilde \chi_{PR}c_1^2\end{bmatrix}$$

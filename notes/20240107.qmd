@@ -1,0 +1,156 @@
+---
+title: Reframing the Project
+date-format: YYYY-MM-DDTHH:mm:ssZ
+preview:
+    port: 4200
+    browser: false
+---
+
+# 20 October
+
+Identify regimes of RNA production where flow is observed.
+
+- $\mathrm{d}t_{\text{max}}=0.1$
+- $t_{\mathrm{end}}=500$
+- $c_0=3.6$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.01, 0.1\}$|
+|$\sigma_\text{prod}$|$\{2.5\}$|
+|$x_{\mathrm{p},0}$|$\{0, 2, 4, 6, 8, 10\}$|
+
+- Nucleus grows significantly
+- $k_\text{prod}=0.01$ negligibly slow dynamics
+- $k_\text{prod}=0.1$ observable slow flow
+    - Deformation more observable for $x_{\mathrm{p},0}\ll$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{1.0, 2.0, 3.0, 4.0, 5.0\}$|
+|$\sigma_\text{prod}$|$\{4.0\}$|
+|$x_{\mathrm{p},0}$|$\{6, 8, 10\}$|
+
+- Nucleus grows significantly
+- $k_\text{prod}\geq 1$ condensate nucleation at the origin
+    - When $x_{\mathrm{p},0}=6,8$ -- seed fuses with nucleated
+        - Fused condensate forms elongated/deformed condensate
+    - When $x_{\mathrm{p},0}=10$ -- seed dissolves
+- Once condensate is at the nucleus, increasing $k_\text{prod}$ increases condensate size
+
+# 21 October
+
+Increase simulation time to see more dynamics and check if no flow is truly stationary.
+
+- $\mathrm{d}t_{\text{max}}=0.1$
+- $t_{\mathrm{end}}=6000$
+- $c_0=3.6$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.01, 0.1, 1.0\}$|
+|$\sigma_\text{prod}$|$\{2.5,4.0,8.0\}$|
+|$x_{\mathrm{p},0}$|$\{0,2,4,6, 8, 10\}$|
+
+- Nucleus grows significantly
+- $k_\text{prod}=0.01$ negligibly slow flow
+- $k_\text{prod}=0.1$ observable flow 
+- $k_\text{prod}=1$ nucleation at the origin
+
+No flow is probably not truly stationary.
+
+# 22 October
+
+A problem was that the condensate becomes so large it elongates at a length scale commensurate to the protein-promoter distance.
+Decrease condensate size by decreasing seed concentration.
+
+- $\mathrm{d}t_{\text{max}}=0.1$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.01, 0.1, 1.0\}$|
+|$\sigma_\text{prod}$|$\{2.5,5.0\}$|
+|$c_{s}$|$\{5,5.5\}$|
+|$x_{\mathrm{p},0}$|$\{2,4,6, 8, 10\}$|
+
+Seed concentration has negligible effect on condensate size.
+
+# 23 October
+
+Instead of decreasing seed concentration, we decrease background protein concentration to be closer to the lower binodal point.
+
+- $\mathrm{d}t_{\text{max}}=0.1$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.05, 0.5, 0.1\}$|
+|$c_0$|$\{3.5, 3.525, 3.55, 3.75\}$|
+
+Background protein concentration controls condensate size.
+
+# 20 November
+
+Using a smaller discretization of production rate and background protein concentration, we plot a phase diagram.
+
+- $\mathrm{d}t_{\text{max}}=1$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.025, 0.05, 0.075, 0.1, 0.25, 0.5\}$|
+|$c_0$|$\{3.51, 3.52, 3.53, \cdots, 3.64\}$|
+
+# 28 November
+
+- $\mathrm{d}t_{\text{max}}=1$
+
+|Parameter|Values|
+|-|-|
+|$\tilde k_{ep}$|$\{0.001, 0.005, 0.01\}$|
+|$\sigma_{\text{well}}$|$\{0, 0.1, 0.5, 1\}$|
+|$k_\text{prod}$|$\{0.25, 0.5\}$|
+
+
+# 2 December
+
+- $k_\text{prod}=0.1$
+
+|Parameter|Values|
+|-|-|
+|$\tilde k_{ep}$|$\{10^{-n}, 5\times 10^{-n}\ \text{ for } n = 1,2,\cdots,8 \}$|
+|$\sigma_{e}$|$\{1, 3, 4, 5\}$|
+
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.1, 0.25, 0.5\}$|
+|$c_0$|$\{3.52, 3.54, 3.56\}$|
+|$\tilde \chi_{\text{PR}}$|$\{0.01, 0.1, 1\}$|
+
+# 3 December
+
+- $\mathrm{d}t_{\text{max}}=0.1$
+
+|Parameter|Values|
+|-|-|
+|$c_0$|$\{3.52, 3.54, 3.56\}$|
+|$\tilde \chi_{\text{PR}}$|$\{0.05, 0.1, 0.5\}$|
+
+# 9 December
+
+- $\mathrm{d}t_{\text{max}}=1$
+
+|Parameter|Values|
+|-|-|
+|$k_\text{prod}$|$\{0.1, 0.5\}$|
+|$\tilde \chi_{\text{PR}}$|$\{0.1, 0.5\}$|
+|$\tilde k_{ep}$|$\{0.01, 0.05, 0.1, 0.5\}$|
+|$r_{e,0}$|$\{0,10\}$|
+
+# 12 December
+
+- $\mathrm{d}t_{\text{max}}=1$
+
+|Parameter|Values|
+|-|-|
+|$\tilde k_{ep}$|$\{0.0001, 0.0005, \cdots, \ 0.5, 1\}$|
+|$\sigma_{e}$|$\{1,3,4,5\}$|
