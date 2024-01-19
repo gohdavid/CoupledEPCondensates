@@ -30,7 +30,7 @@ class TwoComponentModel(object):
     with a rate constant :math:`k_2`
     """
 
-    def __init__(self, mobility_1, mobility_2, modelAB_dynamics_type, degradation_constant, free_energy):
+    def __init__(self, mobility_1, mobility_2, mobility_3, modelAB_dynamics_type, degradation_constant, free_energy):
         """Initialize an object of :class:`TwoComponentModelBModelAB`.
 
         Args:
@@ -53,6 +53,8 @@ class TwoComponentModel(object):
         # Parameters of the dynamical equations
         self._M1 = mobility_1
         self._M2 = mobility_2
+        # Localization locus dynamics
+        self._M3 = mobility_3
         self._modelAB_dynamics_type = modelAB_dynamics_type
         self._free_energy = free_energy
         # Define the reaction terms in the model equations
@@ -90,7 +92,7 @@ class TwoComponentModel(object):
                                                                       sigma=sigma, x0=center_point,
                                                                       simulation_geometry=geometry)
 
-    def set_model_equations(self, c_vector):
+    def set_model_equations(self, c_vector, well_center):
         """Assemble the model equations given a mesh and concentrations
 
         This functions assembles the model equations necessary
@@ -112,40 +114,13 @@ class TwoComponentModel(object):
             "self._free_energy instance does not have an attribute kappa describing the surface energy"
 
         jacobian = self._free_energy.calculate_jacobian(c_vector)
-        # Model B dynamics for species 1
-        # eqn_1 = (fp.TransientTerm(var=c_vector[0])
-        #          == fp.DiffusionTerm(coeff=self._M1 * jacobian[0, 0], var=c_vector[0])
-        #          + fp.DiffusionTerm(coeff=self._M1 * jacobian[0, 1], var=c_vector[1])
-        #          )
-        # eqn_3 = (fp.TransientTerm(var=c_vector[0])
-        #          == fp.DiffusionTerm(coeff=(-self._M1, self._free_energy.kappa), var=c_vector[0])
-        #          )
+
         eqn_1 = (fp.TransientTerm(coeff=1.0, var=c_vector[0])
                  == fp.DiffusionTerm(coeff=self._M1 * jacobian[0][0], var=c_vector[0])
                  + fp.DiffusionTerm(coeff=self._M1 * jacobian[0][1], var=c_vector[1])
                  - fp.DiffusionTerm(coeff=(self._M1, self._free_energy.kappa), var=c_vector[0])
-                 - self._M1 * (self._free_energy.get_gaussian_function(c_vector[0].mesh)).faceGrad.divergence
+                 - self._M1 * (self._free_energy.get_gaussian_function(c_vector[0].mesh, well_center)).faceGrad.divergence
                  )
-        # mu_1_bulk = self._free_energy.calculate_mu_1_bulk(c_vector=c_vector)
-        # self._psi = fp.CellVariable(mesh=c_vector[0].mesh, value=mu_1_bulk.value, hasOld=True)
-        #
-        # eqn_c1 = (fp.TransientTerm(coeff=1.0, var=c_vector[0]) == fp.DiffusionTerm(coeff=self._M1, var=self._psi))
-        # eqn_psi = (fp.ImplicitSourceTerm(coeff=1.0, var=self._psi)
-        #            == mu_1_bulk
-        #            + fp.ImplicitSourceTerm(coeff=jacobian[0, 0], var=c_vector[0]) - jacobian[0, 0] * c_vector[0]
-        #            + jacobian[0, 1] * (c_vector[1] - c_vector[1].old)
-        #            - fp.DiffusionTerm(coeff=self._free_energy.kappa, var=c_vector[0])
-        #            )
-        # eqn_1 = eqn_c1 & eqn_psi
-        # eqn_1 = (fp.TransientTerm(coeff=1.0, var=c_vector[0])
-        #          == self._M1 * mu_1_bulk.faceGrad.divergence
-        #          + self._M1 * fp.ExponentialConvectionTerm(coeff=jacobian[0, 0].grad, var=c_vector[0])
-        #          + self._M1 * fp.DiffusionTerm(coeff=jacobian[0, 0], var=c_vector[0])
-        #          - 2.0 * self._M1 * jacobian[0, 0].grad.dot(c_vector[0].old.grad)
-        #          - self._M1 * jacobian[0, 0] * c_vector[0].old.faceGrad.divergence
-        #          - self._M1 * jacobian[0, 0].faceGrad.divergence * c_vector[0].old
-        #          - fp.DiffusionTerm(coeff=(self._M1, self._free_energy.kappa), var=c_vector[0])
-        #          )
 
         # Model AB dynamics or reaction-diffusion dynamics for species 2 with production and degradation reactions
         if self._modelAB_dynamics_type == 1:
@@ -164,13 +139,17 @@ class TwoComponentModel(object):
                      - self._degradation_term.rate(c_vector[1])
                      )
 
-        # self._equations = eqn_1 & eqn_2 & eqn_3
-        self._equations = [eqn_1, eqn_2]
+        # Localization locus dynamics
+        self._equation3 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+                           - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
+        self._equation4 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+                           - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
+        self._equations = [eqn_1, eqn_2, self._equation3[0]+self._equation3[1], self._equation4[0]+self._equation4[1]]
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
 
-    def step_once(self, c_vector, dt, max_residual, max_sweeps):
+    def step_once(self, c_vector, well_center, dt, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
 
         Args:
@@ -193,6 +172,12 @@ class TwoComponentModel(object):
             dt
 
         """
+        # Solve for the locus position with a time step of 0.1*dt using the Euler method
+        for small_step in range(10):
+            self.set_model_equations(c_vector, well_center)
+            well_center[0].setValue(well_center[0]+self._equations[2]*dt/10)
+            well_center[1].setValue(well_center[1]+self._equations[3]*dt/10)
+
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6
         residual_2 = 1e6
