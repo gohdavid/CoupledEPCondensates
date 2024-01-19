@@ -87,7 +87,7 @@ def write_input_params_from_file(input_filename, target_filename):
                 fo.write(line)
 
 
-def write_stats(t, dt, steps, c_vector, geometry, free_energy, residuals, max_change, target_file):
+def write_stats(t, dt, steps, c_vector, well_center, geometry, free_energy, dynamical_equations, residuals, max_change, target_file):
     """Writes out simulation statistics
 
     Args:
@@ -119,7 +119,9 @@ def write_stats(t, dt, steps, c_vector, geometry, free_energy, residuals, max_ch
             stats_list.append('c_{index}_avg'.format(index=i))
             stats_list.append('c_{index}_min'.format(index=i))
             stats_list.append('c_{index}_max'.format(index=i))
-        stats_list += ['residuals', 'max_rate_of_change', 'free_energy']
+        stats_list += ['residuals','max_rate_of_change','free_energy',
+                       'well_center_x','well_center_y',
+                       'eqn3_potential','eqn3_spring']
         # Write out the header to the file
         with open(target_file, 'w+') as stats:
             stats.write("\t".join(stats_list) + "\n")
@@ -135,14 +137,18 @@ def write_stats(t, dt, steps, c_vector, geometry, free_energy, residuals, max_ch
 
     stats_simulation.append("{:.8f}".format(float(residuals)))
     stats_simulation.append("{:.8f}".format(float(max_change)))
-    stats_simulation.append("{:.8f}".format(np.sum((free_energy.calculate_fe(c_vector)
+    stats_simulation.append("{:.8f}".format(np.sum((free_energy.calculate_fe(c_vector, well_center)
                                                     * geometry.mesh.cellVolumes).value)))
+    stats_simulation.append("{:.8g}".format(well_center[0]()))
+    stats_simulation.append("{:.8g}".format(well_center[1]()))
+    stats_simulation.append("{:.8g}".format(dynamical_equations._equation3[0]()))
+    stats_simulation.append("{:.8g}".format(dynamical_equations._equation3[1]()))
 
     with open(target_file, 'a') as stats:
         stats.write("\t".join(stats_simulation) + "\n")
 
 
-def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, geometry, free_energy, target_file):
+def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_center, geometry, free_energy, target_file):
     """Function to write out the concentration fields and chemical potentials to a hdf5 file
 
     Args:
@@ -177,7 +183,7 @@ def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, geometry, 
 
     # Write out simulation data to the HDF5 file
     with h5py.File(target_file, 'a') as f:
-        mu_vector = free_energy.calculate_mu(c_vector)
+        mu_vector = free_energy.calculate_mu(c_vector, well_center)
         for i in range(len(c_vector)):
             f["c_{index}".format(index=i)][step, :] = c_vector[i].value
             f["mu_{index}".format(index=i)][step, :] = mu_vector[i].value
