@@ -70,23 +70,6 @@ if __name__ == "__main__":
             cd "$SLURM_SUBMIT_DIR"
             echo $PWD
 
-            stage_parameters()
-            {
-                cp $input_file input_parameters_$SLURM_JOBID.txt
-            }
-
-            run_program()
-            {
-                source activate CoupledEPCondensates
-                run-simulation --i $input_file --o $out_folder
-                conda deactivate
-            }
-
-            cleanup_files()
-            {
-                rm input_parameters_$SLURM_JOBID.txt
-            }
-
             movie()
             {
                 source activate CoupledEPCondensates
@@ -95,9 +78,6 @@ if __name__ == "__main__":
                 conda deactivate
                 echo "DONE"
             }
-            stage_parameters
-            run_program
-            cleanup_files
             movie
             """
             run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
