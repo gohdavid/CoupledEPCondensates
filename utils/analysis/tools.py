@@ -12,6 +12,9 @@ import scipy.interpolate as interp
 from sklearn.cluster import DBSCAN
 from pathlib import Path
 from typing import Union, Optional
+from scipy.ndimage import gaussian_filter1d
+import matplotlib as mpl
+from utils import plot
 
 
 class simDir:
@@ -44,7 +47,7 @@ class simDir:
         if geo:
             # Load Gmsh geometry
             self.geometry = set_mesh_geometry(self.params)
-            self.xy = np.vstack((self.geometry.mesh.x, self.geometry.mesh.y)).T
+            self.xy = self.geometry.mesh.cellCenters.value.T
         if hdf5:
             # Load concentration profile
             with h5py.File(self.hdf5_file, mode="r") as concentration_dynamics:
@@ -77,11 +80,12 @@ class simDir:
                 max_value = conc[i].max()
                 self.plotting_range.append([min_value, max_value])
 
-    def makeMovie(self):
+    def makeMovie(self,fps):
         write_movies_two_component_2d(self.directory,
-                                      self.hdf5_file,
+                                      self.hdf5_file.name,
                                       self.movie_params,
-                                      self.geometry.mesh)
+                                      self.geometry.mesh,
+                                      fps = fps)
     def makeFigure(self,
                    i:int,
                    n_rows:int=4,
@@ -141,7 +145,11 @@ class simDir:
         edge_lst = []
         for n in range(len(self.mask)):
             condensate_coords = self.xy[self.mask[n]]
-            arr = self.resample_path(condensate_coords,resample_num_points)
+            if condensate_coords.size == 0:
+                arr = np.empty((resample_num_points,2))
+                arr[:] = np.nan
+            else:
+                arr = self.resample_path(condensate_coords,resample_num_points)
             edge_lst.append(arr)
         self.edge_arr = np.array(edge_lst)
         xydist = self.edge_arr.max(axis=1)-self.edge_arr.min(axis=1)
@@ -184,3 +192,48 @@ class simDir:
         new_points = interp_func(new_distances)
 
         return new_points
+
+
+    def condensate_property_plot(self):
+        cmap = mpl.colormaps["Paired"].colors
+        if not hasattr(self,"com"):
+            self.condensate()
+        com = self.com[~np.isnan(self.com).any(axis=1),:]
+        e = self.eccentricity[~np.isnan(self.eccentricity)]
+        r = self.radius[~np.isnan(self.radius).any(axis=1),:]
+        y = com[:,0]
+        f = gaussian_filter1d(y,5)
+        fig, ax = plt.subplots(2,2)
+        axes = np.ravel(ax)
+        fig.set_size_inches((6,3))
+        axes[0].plot(y,
+                        label="Raw",
+                        color=cmap[0])
+        axes[0].plot(f,
+                        label="Gaussian filter",
+                        color=cmap[1])
+        axes[0].legend()
+        axes[0].set_xlabel("Frame")
+        axes[0].set_ylabel("Distance\nfrom locus")
+        axes[1].plot(com[:,0],
+                        -np.gradient(y),
+                        label="Raw",
+                        color=cmap[0])
+        axes[1].plot(com[:,0],
+                        -np.gradient(f),
+                        label="Gaussian filter",
+                        color=cmap[1])
+        axes[1].set_xlabel("Distance\nfrom locus")
+        axes[1].set_ylim(bottom=0)
+        axes[1].set_ylabel("Condensate\nvelocity")
+        axes[1].legend()
+        axes[2].plot(e)
+        axes[2].set_ylabel("Eccentricity")
+        axes[2].set_xlabel("Frame")
+        var_r = np.var(r,axis=1)
+        axes[3].plot(var_r)
+        axes[3].set_ylabel("Radius\nvariance")
+        axes[3].set_xlabel("Frame")
+        fig.tight_layout()
+        self.makeSubdirectory("figures")
+        fig.savefig(self.directory / "figures" / "condensate.png")
