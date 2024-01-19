@@ -22,15 +22,21 @@ def get_output_dir_name(input_params):
         output_dir (string): Name of the output directory including the important parameter names
     """
     output_dir = (f"M1_{str(input_params['M1'])}"
-                  f"_beta_{str(input_params['beta_tilde'])}"
-                  f"_gamma_{str(input_params['gamma_tilde'])}"
-                  f"_kappa_{str(input_params['kappa_tilde'])}"
-                  f"_kprod_{str(input_params['k_production'])}"
-                  f"_c1Init_{str(input_params['initial_values'][0])}"
-                  f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
-                  f"_rxnSigma_{str(input_params['reaction_sigma'])}"
-                  f"_seed_{str(input_params['seed_value'][0])}"
-                  f"_loc_{str(input_params['location'][0][0])}"
+                  f"_b_{str(input_params['beta_tilde'])}"
+                  f"_g_{str(input_params['gamma_tilde'])}"
+                  f"_c_{str(input_params['chiPR_tilde'])}"
+                  f"_k_{str(input_params['kappa_tilde'])}"
+                  f"_kp_{str(input_params['k_production'])}"
+                  f"_c1_{str(input_params['initial_values'][0])}"
+                #   f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
+                  f"_sw_{str(input_params['sigma'])}"
+                  f"_sr_{str(input_params['reaction_sigma'])}"
+                  f"_cn_{str(input_params['seed_value'][0])}"
+                  f"_l_{str(input_params['location'][0][0])}"
+                  f"_M3_{str(input_params['M3'])}"
+                  f"_kt_{str(input_params['k_tilde'])}"
+                  f"_rl_{str(input_params['rest_length'][0])}"
+                  f"_wd_{str(input_params['well_depth'])}"
                   )
 
     #  + '_K_' + str(input_params['basal_k_production']) \
@@ -119,6 +125,7 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
         # Step over a time step dt and solve the equations
         while dt > dt_min:
             has_converged, residuals, max_change = equations.step_once(c_vector=concentration_vector, dt=dt,
+                                                                       well_center=well_center,
                                                                        max_residual=max_residual, max_sweeps=max_sweeps)
             if not has_converged:
                 dt *= 0.5
@@ -133,12 +140,14 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
         # Write simulation output to files
         if step % data_log_frequency == 0:
             file_operations.write_stats(t=t, dt=dt, steps=step, c_vector=concentration_vector,
-                                        geometry=simulation_geometry, free_energy=free_en,
-                                        residuals=np.max(residuals), max_change=np.max(max_change),
+                                        well_center=well_center, geometry=simulation_geometry, free_energy=free_en,
+                                        dynamical_equations=equations,
+                                        residuals=np.max(residuals),max_change=np.max(max_change),
                                         target_file=os.path.join(out_directory, 'stats.txt'))
             file_operations.write_spatial_variables_to_hdf5_file(step=int(step / data_log_frequency),
                                                                  total_steps=int(total_steps / data_log_frequency) + 1,
                                                                  c_vector=concentration_vector,
+                                                                 well_center=well_center,
                                                                  geometry=simulation_geometry,
                                                                  free_energy=free_en,
                                                                  target_file=os.path.join(out_directory,
@@ -180,6 +189,10 @@ if __name__ == "__main__":
                                                            simulation_geometry=sim_geometry)
     print('Successfully initialized concentration vectors ...')
 
+    # Initialize well center
+    well_center = simulation_helper.initialize_well_center(input_params=input_parameters)
+    print('Successfully initialized well center ...')
+
     # Set free energy
     fe = simulation_helper.set_free_energy(input_parameters)
     print('Successfully set up the free energy ...')
@@ -187,6 +200,7 @@ if __name__ == "__main__":
     # Choose the model equations
     model_equations = simulation_helper.set_model_equations(input_params=input_parameters,
                                                             concentration_vector=c_vector,
+                                                            well_center=well_center,
                                                             free_en=fe,
                                                             simulation_geometry=sim_geometry)
     print('Successfully set up model equations ...')
