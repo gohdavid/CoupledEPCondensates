@@ -237,3 +237,9 @@ class simDir:
         fig.tight_layout()
         self.makeSubdirectory("figures")
         fig.savefig(self.directory / "figures" / "condensate.png")
+
+    def rna(self):
+        volumes = self.geometry.mesh.cellVolumes
+        volume_vector = np.reshape(volumes,(len(volumes),1))
+        self.rna_amount = self.concentration_profile[1]@volume_vector
+        return self.rna_amount
