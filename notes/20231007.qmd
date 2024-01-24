@@ -1,8 +1,9 @@
 
 ---
 title: Coupled enhancer-promoter condensates
-author: David Goh
-date-format: YYYY-MM-DDTHH:mm:ssZ
+author: David David
+date: last-modified
+date-format: "YYYY-MM-DDTHH:mm:ssZ"
 ---
 
 

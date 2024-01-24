@@ -1,9 +1,8 @@
 ---
 title: Reframing the Project
-date-format: YYYY-MM-DDTHH:mm:ssZ
-preview:
-    port: 4200
-    browser: false
+author: David David
+date: last-modified
+date-format: "YYYY-MM-DDTHH:mm:ssZ"
 ---
 
 # 20 October

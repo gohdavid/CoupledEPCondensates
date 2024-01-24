@@ -1,10 +1,9 @@
 
 ---
-title: Coupled enhancer-promoter condensates
-date-format: YYYY-MM-DDTHH:mm:ssZ
-preview:
-    port: 4200
-    browser: false
+title: Dimensionless Dynamical Equations and Free Energy
+author: David David
+date: last-modified
+date-format: "YYYY-MM-DDTHH:mm:ssZ"
 ---
 ## Dimensional Asymmetric Double-Well
 $$F_{DW}(\rho_p , a , b)+\cdots = \int d^2x \bigg[\rho_p (\phi_p -a)^2(\phi_p -b)^2-\chi \phi_p \phi_r+c \phi_p^2 \phi_r^2+\rho_r\phi_r^2+\frac{\kappa}{2}(\nabla\phi_p)^2\bigg]$$
