@@ -141,14 +141,14 @@ def write_stats(t, dt, steps, c_vector, well_center, geometry, free_energy, dyna
                                                     * geometry.mesh.cellVolumes).value)))
     stats_simulation.append("{:.8g}".format(well_center[0]()))
     stats_simulation.append("{:.8g}".format(well_center[1]()))
-    stats_simulation.append("{:.8g}".format(dynamical_equations._equation3[0]()))
-    stats_simulation.append("{:.8g}".format(dynamical_equations._equation3[1]()))
+    stats_simulation.append("{:.8g}".format(dynamical_equations._eqn_locus_x[0]()))
+    stats_simulation.append("{:.8g}".format(dynamical_equations._eqn_locus_x[1]()))
 
     with open(target_file, 'a') as stats:
         stats.write("\t".join(stats_simulation) + "\n")
 
 
-def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_center, geometry, free_energy, target_file):
+def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_center, geometry, free_energy, target_file, t):
     """Function to write out the concentration fields and chemical potentials to a hdf5 file
 
     Args:
@@ -179,11 +179,16 @@ def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_cente
         number_of_mesh_points = np.shape(c_vector)[1]
         with h5py.File(target_file, 'w') as f:
             for sv in list_of_spatial_variables:
+                print(sv)
                 f.create_dataset(sv, (total_steps, number_of_mesh_points))
+            f.create_dataset("t", (total_steps, 1))
+            f.create_dataset("locus_position", (total_steps, 2))
 
     # Write out simulation data to the HDF5 file
     with h5py.File(target_file, 'a') as f:
         mu_vector = free_energy.calculate_mu(c_vector, well_center)
         for i in range(len(c_vector)):
             f["c_{index}".format(index=i)][step, :] = c_vector[i].value
-            f["mu_{index}".format(index=i)][step, :] = mu_vector[i].value
+            # f["mu_{index}".format(index=i)][step, :] = mu_vector[i].value
+            f["t"][step, :] = t
+            f["locus_position"][step, :] = well_center[:]

@@ -11,40 +11,6 @@ import numpy as np
 from tqdm import tqdm
 import sys
 
-
-def get_output_dir_name(input_params):
-    """Set dynamical equations for the model
-
-    Args:
-        input_params (dict): Dictionary that contains input parameters
-
-    Returns:
-        output_dir (string): Name of the output directory including the important parameter names
-    """
-    output_dir = (f"M1_{str(input_params['M1'])}"
-                  f"_b_{str(input_params['beta_tilde'])}"
-                  f"_g_{str(input_params['gamma_tilde'])}"
-                  f"_c_{str(input_params['chiPR_tilde'])}"
-                  f"_k_{str(input_params['kappa_tilde'])}"
-                  f"_kp_{str(input_params['k_production'])}"
-                  f"_c1_{str(input_params['initial_values'][0])}"
-                #   f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
-                  f"_sw_{str(input_params['sigma'])}"
-                  f"_sr_{str(input_params['reaction_sigma'])}"
-                  f"_cn_{str(input_params['seed_value'][0])}"
-                  f"_l_{str(input_params['location'][0][0])}"
-                  f"_M3_{str(input_params['M3'])}"
-                  f"_kt_{str(input_params['k_tilde'])}"
-                  f"_rl_{str(input_params['rest_length'][0])}"
-                  f"_wd_{str(input_params['well_depth'])}"
-                  )
-
-    #  + '_K_' + str(input_params['basal_k_production']) \
-    # + '_well_depth_' + str(input_params['well_depth'])
-    # + '_reaction_sigma_' + str(input_params['reaction_sigma'])
-    return output_dir
-
-
 def run_simulation(input_params, concentration_vector, simulation_geometry, free_en, equations, out_directory):
     """Integrate the dynamical equations for concentrations and write to files
 
@@ -151,7 +117,8 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
                                                                  geometry=simulation_geometry,
                                                                  free_energy=free_en,
                                                                  target_file=os.path.join(out_directory,
-                                                                                          'spatial_variables.hdf5'))
+                                                                                          'spatial_variables.hdf5'),
+                                                                 t=t)
         # Update all the variables that keep track of time
         step += 1
         elapsed += dt
@@ -206,7 +173,7 @@ if __name__ == "__main__":
     print('Successfully set up model equations ...')
 
     # Create the output directory
-    output_directory = os.path.join(args.o, get_output_dir_name(input_parameters))
+    output_directory = os.path.join(args.o, simulation_helper.get_output_dir_name(input_parameters))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     elif os.path.exists(output_directory):

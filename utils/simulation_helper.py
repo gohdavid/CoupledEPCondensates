@@ -44,7 +44,6 @@ def set_mesh_geometry(input_params):
 
     return simulation_geometry
 
-
 def initialize_concentrations(input_params, simulation_geometry):
     """Set initial conditions for the concentration profiles
 
@@ -85,6 +84,11 @@ def initialize_concentrations(input_params, simulation_geometry):
                                                        random_seed=int(input_params['random_seed']))
     return concentration_vector
 
+def initialize_well_center(input_params):
+    well_center = input_params["well_center"]
+    well_center_x = fp.Variable(name='well_center_x', value=well_center[0])
+    well_center_y = fp.Variable(name='well_center_y', value=well_center[1])
+    return [well_center_x, well_center_y]
 
 def set_free_energy(input_params):
     """Set free energy of interactions
@@ -118,10 +122,22 @@ def set_free_energy(input_params):
                                                                              well_depth=input_params['well_depth'],
                                                                              well_center=input_params['well_center'],
                                                                              sigma=input_params['sigma'])
+    elif input_params['free_energy_type'] == 3:
+        free_en = free_energy.TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(c_bar_1=input_params['c_bar_1'],
+                                                                                    beta_tilde=input_params['beta_tilde'],
+                                                                                    gamma_tilde=input_params['gamma_tilde'],
+                                                                                    lamda_tilde=input_params['lamda_tilde'],
+                                                                                    kappa_tilde=input_params['kappa_tilde'],
+                                                                                    chiPR_tilde=input_params['chiPR_tilde'],
+                                                                                    well_depth=input_params['well_depth'],
+                                                                                    well_center=input_params['well_center'],
+                                                                                    sigma=input_params['sigma'],
+                                                                                    k_tilde=input_params['k_tilde'],
+                                                                                    r_p=input_params['r_p'],
+                                                                                    rest_length=input_params['rest_length'])
     return free_en
 
-
-def set_model_equations(input_params, concentration_vector, free_en, simulation_geometry):
+def set_model_equations(input_params, concentration_vector, well_center, free_en, simulation_geometry):
     """Set dynamical equations for the model
 
     Args:
@@ -142,24 +158,104 @@ def set_model_equations(input_params, concentration_vector, free_en, simulation_
     Returns:
         equations (utils.dynamical_equations): An instance of one of the classes in mod:`utils.dynamical_equations`
     """
-    equations = dynamical_equations.TwoComponentModel(mobility_1=input_params['M1'],
-                                                      mobility_2=input_params['M2'],
-                                                      modelAB_dynamics_type=input_params['modelAB_dynamics_type'],
-                                                      degradation_constant=input_params['k_degradation'],
-                                                      free_energy=free_en)
+    if input_params["model_type"] == 1:
+        assert input_params["n_concentrations"] == 2, "TwoComponentModel only supports 2 concentrations"
+        equations = dynamical_equations.TwoComponentModel(mobility_1=input_params['M1'],
+                                                        mobility_2=input_params['M2'],
+                                                        mobility_3=input_params['M3'],
+                                                        modelAB_dynamics_type=input_params['modelAB_dynamics_type'],
+                                                        degradation_constant=input_params['k_degradation'],
+                                                        free_energy=free_en)
 
-    if input_params['reaction_type'] == 1:
-        equations.set_production_term(reaction_type=input_params['reaction_type'],
-                                      rate_constant=input_params['basal_k_production'])
+        if input_params['reaction_type'] == 1:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        rate_constant=input_params['basal_k_production'])
 
-    elif input_params['reaction_type'] == 2:
-        equations.set_production_term(reaction_type=input_params['reaction_type'],
-                                      basal_rate_constant=input_params['basal_k_production'],
-                                      rate_constant=input_params['k_production'],
-                                      sigma=input_params['reaction_sigma'],
-                                      center_point=input_params['reaction_center'],
-                                      geometry=simulation_geometry)
+        elif input_params['reaction_type'] == 2:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        basal_rate_constant=input_params['basal_k_production'],
+                                        rate_constant=input_params['k_production'],
+                                        sigma=input_params['reaction_sigma'],
+                                        center_point=input_params['reaction_center'],
+                                        geometry=simulation_geometry)
 
-    equations.set_model_equations(c_vector=concentration_vector)
+        elif input_params['reaction_type'] == 3:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        basal_rate_constant=input_params['basal_k_production'],
+                                        rate_constant=input_params['k_production'],
+                                        sigma=input_params['reaction_sigma'],
+                                        center_point=input_params['reaction_center'],
+                                        geometry=simulation_geometry,
+                                        hill_coefficient=input_params['hill_coefficient'],
+                                        hill_threshold=input_params['hill_threshold'],
+                                        hill_prefactor=input_params['hill_prefactor'])
+
+        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
+    elif input_params["model_type"] == 2:
+        assert input_params["n_concentrations"] == 3, "ThreeComponentModel only supports 3 concentrations"
+        equations = dynamical_equations.ThreeComponentModel(mobility_1=input_params['M1'],
+                                                        mobility_2=input_params['M2'],
+                                                        mobility_3=input_params['M3'],
+                                                        modelAB_dynamics_type=input_params['modelAB_dynamics_type'],
+                                                        degradation_constant=input_params['k_degradation'],
+                                                        free_energy=free_en,
+                                                        tau=input_params['tau'])
+
+        if input_params['reaction_type'] == 1:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        rate_constant=input_params['basal_k_production'])
+
+        elif input_params['reaction_type'] == 2:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        basal_rate_constant=input_params['basal_k_production'],
+                                        rate_constant=input_params['k_production'],
+                                        sigma=input_params['reaction_sigma'],
+                                        center_point=input_params['reaction_center'],
+                                        geometry=simulation_geometry)
+
+        elif input_params['reaction_type'] == 3:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        basal_rate_constant=input_params['basal_k_production'],
+                                        rate_constant=input_params['k_production'],
+                                        sigma=input_params['reaction_sigma'],
+                                        center_point=input_params['reaction_center'],
+                                        geometry=simulation_geometry,
+                                        hill_coefficient=input_params['hill_coefficient'],
+                                        hill_threshold=input_params['hill_threshold'],
+                                        hill_prefactor=input_params['hill_prefactor'])
+
+        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
 
     return equations
+
+def get_output_dir_name(input_params):
+    """Set output directory name for the given input parameters.
+
+    Args:
+        input_params (dict): Dictionary that contains input parameters
+
+    Returns:
+        output_dir (string): Name of the output directory including the important parameter names
+    """
+    output_dir = (f"M1_{str(input_params['M1'])}"
+                  f"_b_{str(input_params['beta_tilde'])}"
+                  f"_g_{str(input_params['gamma_tilde'])}"
+                  f"_c_{str(input_params['chiPR_tilde'])}"
+                  f"_k_{str(input_params['kappa_tilde'])}"
+                  f"_kp_{str(input_params['k_production'])}"
+                  f"_c1_{str(input_params['initial_values'][0])}"
+                #   f"_noiseVar_{str(input_params['initial_condition_noise_variance'][0])}"
+                  f"_sw_{str(input_params['sigma'])}"
+                  f"_sr_{str(input_params['reaction_sigma'])}"
+                  f"_cn_{str(input_params['seed_value'][0])}"
+                  f"_l_{str(input_params['location'][0][0])}"
+                  f"_M3_{str(input_params['M3'])}"
+                  f"_kt_{str(input_params['k_tilde'])}"
+                  f"_rl_{str(input_params['rest_length'][0])}"
+                  f"_wd_{str(input_params['well_depth'])}"
+                  )
+
+    #  + '_K_' + str(input_params['basal_k_production']) \
+    # + '_well_depth_' + str(input_params['well_depth'])
+    # + '_reaction_sigma_' + str(input_params['reaction_sigma'])
+    return output_dir

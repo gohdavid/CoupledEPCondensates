@@ -15,6 +15,8 @@ from typing import Union, Optional
 from scipy.ndimage import gaussian_filter1d
 import matplotlib as mpl
 from utils import plot
+import multiprocessing as mp
+import pandas as pd
 
 
 class simDir:
@@ -25,7 +27,7 @@ class simDir:
 
         # Parse simulation parameter input. Simulation directories have this file by
         # default.
-        self.params_file: str = self.directory / "input_params.txt"
+        self.params_file = self.directory / "input_params.txt"
         self.params = input_parse(self.params_file)
 
         # Simulation directories have this file by default.
@@ -35,12 +37,18 @@ class simDir:
         self.movie_params_file = movie_parameters
         if os.path.isfile(self.movie_params_file):
             self.movie_params = input_parse(self.movie_params_file)
-        else:
+        elif self.params["n_concentrations"] == 2.0:
             print("Using default movie parameters.")
             self.movie_params = {'num_components': 2.0,
                                  'color_map': ['Blues', 'Reds'],
                                  'titles': ['Protein', 'RNA'],
                                  'figure_size': [15, 6]}
+        elif self.params["n_concentrations"] == 3.0:
+            print("Using default movie parameters.")
+            self.movie_params = {'num_components': 3.0,
+                                 'color_map': ['Blues', 'Reds', 'Greens'],
+                                 'titles': ['Protein', 'RNA', 'Active Protein'],
+                                 'figure_size': [22, 6]}
 
     def run(self, geo: bool=True, hdf5: bool=True,
             plot_limits: bool=True, condensate: bool=True):
@@ -153,8 +161,8 @@ class simDir:
             edge_lst.append(arr)
         self.edge_arr = np.array(edge_lst)
         xydist = self.edge_arr.max(axis=1)-self.edge_arr.min(axis=1)
-        ratio = xydist[:,0]/xydist[:,1]
-        self.eccentricity = np.sqrt(np.where(ratio<1,1-ratio**2,1-1/ratio**2))
+        self.aspect_ratio = xydist[:,0]/xydist[:,1]
+        self.eccentricity = np.sqrt(np.where(self.aspect_ratio<1,1-self.aspect_ratio**2,1-1/self.aspect_ratio**2))
         self.radius = np.sqrt(((self.edge_arr-self.com[:,None,:])**2).sum(axis=2))
         return self.com, self.eccentricity, self.radius
 
@@ -243,3 +251,33 @@ class simDir:
         volume_vector = np.reshape(volumes,(len(volumes),1))
         self.rna_amount = self.concentration_profile[1]@volume_vector
         return self.rna_amount
+
+class springPhaseDiagram:
+    def __init__(self,
+                 directory: str):
+        self.sweep_directory = Path(directory)
+        self.sweep_file = self.sweep_directory / "sweep_parameters.txt"
+        self.sweep_parameters = [line.split(",")[0] for line in self.sweep_file.read_text().splitlines()]
+
+    def extract_data(self,frame):
+        simdir_paths = [file.parent for file in self.sweep_directory.glob("./*/input_params.txt")]
+        processes = mp.Pool(8-1)
+        self.results = processes.map(self.worker,[(path,frame) for path in simdir_paths])
+        self.df = pd.DataFrame(self.results)
+        if 'rest_length' in self.df.columns:
+            self.df.loc[:, "rest_length"] = self.df["rest_length"].apply(lambda x: eval(x)[0]).astype(np.float64)
+        self.df.loc[:, "k_tilde"] = self.df["k_tilde"].astype(np.float64)
+    
+    def worker(self,worker_input):
+        simdir_path, frame = worker_input
+        sim = simDir(simdir_path)
+        param_values = sim.params
+        relevant_params = {parameter: str(param_values[parameter]) for parameter in self.sweep_parameters}
+        sim.run()
+        sim.rna()
+        sim.condensate()
+        return relevant_params | {"rna_amount": sim.rna_amount.flatten()[frame],
+                                "condensate_com": sim.com[frame,0],
+                                "aspect_ratio": sim.aspect_ratio[frame],
+                                "mask": sim.xy[sim.mask[frame,:],:]}
+

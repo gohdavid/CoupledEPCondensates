@@ -140,11 +140,11 @@ class TwoComponentModel(object):
                      )
 
         # Localization locus dynamics
-        self._equation3 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+        self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
-        self._equation4 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+        self._eqn_locus_y = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
-        self._equations = [eqn_1, eqn_2, self._equation3[0]+self._equation3[1], self._equation4[0]+self._equation4[1]]
+        self._equations = [eqn_1, eqn_2, self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
@@ -309,7 +309,7 @@ class TwoComponentModel(object):
             c_vector[i].updateOld()
         # self._psi.updateOld()
 
-class TwoComponentTimeDelayModel(object):
+class ThreeComponentModel(object):
     """Two component system, with Model B for species 1 and Model AB or reaction-diffusion with reactions for species 2
 
     This class describes the spatiotemporal dynamics of concentration fields two component system given by the below
@@ -333,7 +333,7 @@ class TwoComponentTimeDelayModel(object):
     with a rate constant :math:`k_2`
     """
 
-    def __init__(self, mobility_1, mobility_2, mobility_3, modelAB_dynamics_type, degradation_constant, free_energy):
+    def __init__(self, mobility_1, mobility_2, mobility_3, modelAB_dynamics_type, degradation_constant, free_energy, tau):
         """Initialize an object of :class:`TwoComponentModelBModelAB`.
 
         Args:
@@ -349,7 +349,7 @@ class TwoComponentTimeDelayModel(object):
 
             c_vector (numpy.ndarray): A 2x1 vector of species concentrations that looks like :math:`[c_1, c_2]`.
 
-            The concentration variables :math:`c_1` and :math:`c_2` must be instances of the class
+            The concentration variables : math:`c_1` and :math:`c_2` must be instances of the class
             :class:`fipy.CellVariable`
         """
 
@@ -360,6 +360,8 @@ class TwoComponentTimeDelayModel(object):
         self._M3 = mobility_3
         self._modelAB_dynamics_type = modelAB_dynamics_type
         self._free_energy = free_energy
+        # Time delay
+        self._tau = tau
         # Define the reaction terms in the model equations
         self._production_term = None
         self._degradation_term = rates.FirstOrderReaction(k=degradation_constant)
@@ -441,16 +443,24 @@ class TwoComponentTimeDelayModel(object):
                      + self._production_term.rate(c_vector[0])
                      - self._degradation_term.rate(c_vector[1])
                      )
+        
+        # Memory kernel for active protein
+        eqn_3 = (fp.TransientTerm(coeff=self._tau, var=c_vector[2])
+                 == - c_vector[2] + c_vector[0]
+                 )
 
         # Localization locus dynamics
-        self._equation3 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
-                           - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
-        self._equation4 = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
-                           - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
-        self._equations = [eqn_1, eqn_2, self._equation3[0]+self._equation3[1], self._equation4[0]+self._equation4[1]]
+        self._equations = [eqn_1, eqn_2, eqn_3]
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
+    
+    def set_locus_equations(self, c_vector, well_center):
+        self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+                           - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
+        self._eqn_locus_y = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
+                           - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
+        self._locus_equations = [self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
     def step_once(self, c_vector, well_center, dt, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
@@ -475,11 +485,12 @@ class TwoComponentTimeDelayModel(object):
             dt
 
         """
-        # Solve for the locus position with a time step of 0.1*dt using the Euler method
-        for small_step in range(10):
-            self.set_model_equations(c_vector, well_center)
-            well_center[0].setValue(well_center[0]+self._equations[2]*dt/10)
-            well_center[1].setValue(well_center[1]+self._equations[3]*dt/10)
+        # Solve for the locus position with a time step of 1/ratio*dt using the Euler method
+        ratio = 100
+        for small_step in range(ratio):
+            self.set_locus_equations(c_vector, well_center)
+            well_center[0].setValue(well_center[0]+self._equations[0]*dt/ratio)
+            well_center[1].setValue(well_center[1]+self._equations[1]*dt/ratio)
 
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6
@@ -508,105 +519,20 @@ class TwoComponentTimeDelayModel(object):
                 break
         max_change_c_1 = np.max([max_change_c_1, np.max(np.abs((c_vector[0] - c_vector[0].old).value))])
         c_vector[0].updateOld()
-
-        residuals = np.array([residual_1, residual_2, residual_3])
-        if np.max(residuals) < max_residual:
-            has_converged = True
-        max_change = np.max([max_change_c_1, max_change_c_2])
-
-        return has_converged, residuals, max_change
-
-    def step_once_old_2(self, c_vector, dt, max_sweeps):
-        """Function that solves the model equations over a time step of dt to get the concentration profiles.
-
-        Args:
-            c_vector (numpy.ndarray): A 2x1 vector of species concentrations that looks like :math:`[c_1, c_2]`.
-            The concentration variables :math:`c_1` and :math:`c_2` must be instances of the class
-            :class:`fipy.CellVariable`
-
-            dt (float): Size of time step to solve the model equations over once
-
-            max_sweeps (int): Number of times to sweep using the function sweep() in the fipy package
-
-        Returns:
-            residuals (numpy.ndarray): A 2x1 numpy array containing residuals after solving the equations
-
-            max_change (float): Maximum change in the concentration fields at any given position for the time interval
-            dt
-
-        """
-
-        # Solve the model equations for a time step of dt by sweeping max_sweeps times
-        residual_1 = 1e6
-        residual_2 = 1e6
-        residual_3 = 1e6
-
-        # Split the non-linear operator separately from the linear operators and use Strang splitting to get second
-        # order accuracy
-        # eqn = (self._equations[0] & self._equations[1])
-
+        
         for i in range(max_sweeps):
-            residual_1 = self._equations[2].sweep(dt=0.5*dt, var=c_vector[0])
-        c_vector[0].updateOld()
-        for i in range(max_sweeps):
-            residual_2 = self._equations[0].sweep(dt=dt)
-        # residual_2 = eqn.solve(dt=dt)
-            residual_3 = self._equations[1].sweep(dt=dt)
-        self.update_old(c_vector=c_vector)
-        for i in range(max_sweeps):
-            residual_4 = self._equations[2].sweep(dt=0.5*dt, var=c_vector[0])
+            residual_4 = self._equations[2].sweep(dt=dt, var=c_vector[2], solver=self._solver)
+            if np.max(residual_4) < max_residual:
+                break
+        max_change_c_3 = np.max(np.abs((c_vector[2] - c_vector[2].old).value))
+        c_vector[2].updateOld()
 
         residuals = np.array([residual_1, residual_2, residual_3, residual_4])
+        if np.max(residuals) < max_residual:
+            has_converged = True
+        max_change = np.max([max_change_c_1, max_change_c_2, max_change_c_3])
 
-        max_change_c_1 = np.max(np.abs((c_vector[0] - c_vector[0].old).value))
-        max_change_c_2 = np.max(np.abs((c_vector[1] - c_vector[1].old).value))
-        max_change = np.max([max_change_c_1, max_change_c_2])
-
-        return residuals, max_change
-
-    def step_once_old(self, c_vector, dt, max_sweeps):
-        """Function that solves the model equations over a time step of dt to get the concentration profiles.
-
-        Args:
-            c_vector (numpy.ndarray): A 2x1 vector of species concentrations that looks like :math:`[c_1, c_2]`.
-            The concentration variables :math:`c_1` and :math:`c_2` must be instances of the class
-            :class:`fipy.CellVariable`
-
-            dt (float): Size of time step to solve the model equations over once
-
-            max_sweeps (int): Number of times to sweep using the function sweep() in the fipy package
-
-        Returns:
-            residuals (numpy.ndarray): A 2x1 numpy array containing residuals after solving the equations
-
-            max_change (float): Maximum change in the concentration fields at any given position for the time interval
-            dt
-
-        """
-
-        # Solve the model equations for a time step of dt by sweeping max_sweeps times
-        residual_1 = 1e6
-        residual_2 = 1e6
-        residual_3 = 1e6
-
-        # Strang Splitting
-        for i in range(max_sweeps):
-            residual_1 = self._equations[1].sweep(dt=0.5*dt, var=c_vector[1], solver=self._solver)
-        c_vector[1].updateOld()
-        for i in range(max_sweeps):
-            residual_2 = self._equations[0].sweep(dt=dt, var=c_vector[0], solver=self._solver)
-        c_vector[0].updateOld()
-        for i in range(max_sweeps):
-            residual_3 = self._equations[1].sweep(dt=0.5*dt, var=c_vector[1], solver=self._solver)
-
-        residuals = np.array([residual_1, residual_2, residual_3])
-
-        max_change_c_1 = np.max(np.abs((c_vector[0] - c_vector[0].old).value))
-        max_change_c_2 = np.max(np.abs((c_vector[1] - c_vector[1].old).value))
-        max_change = np.max([max_change_c_1, max_change_c_2])
-
-        return residuals, max_change
-
+        return has_converged, residuals, max_change
     def update_old(self, c_vector):
         for i in range(len(c_vector)):
             c_vector[i].updateOld()

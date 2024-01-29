@@ -57,32 +57,31 @@ if __name__ == "__main__":
         file_operations.write_input_params_from_dict(input_parameters=input_parameters,
                                                      target_filename=input_parameter_file_name_during_sweep)
         # Submit job using this parameter file
-        if not (os.path.exists("run_simulation.slurm")):
-            # Write a default run_simulation.slurm file if it does not exist in the
-            # repository
-            run_simulation_slurm = """\
-            #!/bin/bash
-            #SBATCH -J CoupledEPCondensates
-            #SBATCH --mail-user davidgoh
-            #SBATCH -p sched_mit_arupc_long
-            #SBATCH -t 12:00:00
-            #SBATCH --mem-per-cpu 4000
-            cd "$SLURM_SUBMIT_DIR"
-            echo $PWD
+        # Write a default run_simulation.slurm file if it does not exist in the
+        # repository
+        run_simulation_slurm = """\
+        #!/bin/bash
+        #SBATCH -J CoupledEPCondensates
+        #SBATCH --mail-user davidgoh
+        #SBATCH -p sched_mit_arupc,sched_mit_arupc_long
+        #SBATCH -t 3:00:00
+        #SBATCH --mem-per-cpu 4000
+        cd "$SLURM_SUBMIT_DIR"
+        echo $PWD
 
-            movie()
-            {
-                source activate CoupledEPCondensates
-                output_folder=$(python -c "from utils.scripts.run_simulation import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
-                make-movie --i $output_folder
-                conda deactivate
-                echo "DONE"
-            }
-            movie
-            """
-            run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
-            with open("run_simulation.slurm","w") as fhandle:
-                fhandle.write(run_simulation_slurm)
+        movie()
+        {
+            source activate CoupledEPCondensates
+            output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
+            make-movie --i $output_folder
+            conda deactivate
+            echo "DONE"
+        }
+        movie
+        """
+        run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
+        with open("run_simulation.slurm","w") as fhandle:
+            fhandle.write(run_simulation_slurm)
 
         os.system('sbatch --export=input_file={},out_folder={} run_simulation.slurm'
                     .format(input_parameter_file_name_during_sweep, output_directory))

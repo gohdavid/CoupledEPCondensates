@@ -61,8 +61,8 @@ if __name__ == "__main__":
         #!/bin/bash
         #SBATCH -J CoupledEPCondensates
         #SBATCH --mail-user davidgoh
-        #SBATCH -p sched_mit_arupc_long
-        #SBATCH -t 12:00:00
+        #SBATCH -p sched_mit_arupc,sched_mit_arupc_long
+        #SBATCH -t 5:59:00
         #SBATCH --mem-per-cpu 4000
         cd "$SLURM_SUBMIT_DIR"
         echo $PWD
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         movie()
         {
             source activate CoupledEPCondensates
-            output_folder=$(python -c "from utils.scripts.run_simulation import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
+            output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
             make-movie --i $output_folder
             conda deactivate
             echo "DONE"

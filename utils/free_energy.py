@@ -494,7 +494,7 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
     interaction strength captured by a Flory parameter :math:`\\tilde{\\gamma}`
     """
 
-    def __init__(self, c_bar_1, beta_tilde, gamma_tilde, lamda_tilde, kappa_tilde, well_center, well_depth, sigma):
+    def __init__(self, c_bar_1, beta_tilde, gamma_tilde, lamda_tilde, chiPR_tilde, kappa_tilde, well_center, well_depth, sigma, k_tilde, r_p, rest_length):
         """Initialize an object of :class:`TwoCompDoubleWellFHCrossQuadratic`.
 
         Args:
@@ -530,10 +530,14 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         self._gamma_tilde = gamma_tilde
         self._lambda_tilde = lamda_tilde
         self._kappa_tilde = kappa_tilde
+        self._chiPR_tilde = chiPR_tilde
         self._well_center = well_center
         self._well_depth = well_depth
         self._sigma = sigma
         self._c_bar_1 = c_bar_1
+        self._k_tilde = k_tilde
+        self._r_p = r_p
+        self._rest_length = rest_length
 
     @property
     def kappa(self):
@@ -541,7 +545,7 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         This is used to set up the surface tension term in the dynamical equations"""
         return self._kappa_tilde
 
-    def get_gaussian_function(self, mesh):
+    def get_gaussian_function(self, mesh, well_center):
         """Function that calculates :math:`e^{-|\\vec{r}-\\vec{r}_0|^2/2\\sigma^2}`
 
         Args:
@@ -553,14 +557,14 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         # Get mesh dimensions from the CellVariables in c_vector
         mesh_dimensions = np.shape(mesh.cellCenters.value)[0]
         # Calculate distance of each mesh point from the center of the Gaussian well
-        distance_squared_from_well_center = np.sum([(mesh.cellCenters[i] - self._well_center[i]) ** 2
+        distance_squared_from_well_center = np.sum([(mesh.cellCenters[i] - well_center[i]) ** 2
                                                     for i in range(mesh_dimensions)], 0)
         gaussian_function = fp.CellVariable(mesh=mesh,
                                             value=np.exp(-distance_squared_from_well_center / (2 * self._sigma ** 2)))
         gaussian_function = self._well_depth * gaussian_function
         return gaussian_function
 
-    def calculate_fe(self, c_vector):
+    def calculate_fe(self, c_vector, well_center):
         """Calculate free energy according to the expression in class description.
 
         Args:
@@ -575,8 +579,8 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         """
 
         # Check that c_vector satisfies the necessary conditions
-        assert len(c_vector) == 2, \
-            "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadratic.calculate_fe() is not 2x1"
+        # assert len(c_vector) == 2, \ 
+            # "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadratic.calculate_fe() is not 2x1"
         assert hasattr(c_vector[0], "grad"), \
             "The instance c_vector[0] has no attribute grad associated with it"
         assert hasattr(c_vector[1], "grad"), \
@@ -589,14 +593,15 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         # Calculate the free energy
         fe = (0.25 * (c_vector[0] - self._c_bar_1) ** 4
               + 0.5 * self._beta_tilde * (c_vector[0] - self._c_bar_1) ** 2
-              - self.get_gaussian_function(c_vector[0].mesh) * c_vector[0]
+              - self.get_gaussian_function(c_vector[0].mesh, well_center) * c_vector[0]
               + self._gamma_tilde * c_vector[0] * c_vector[1]
               + 0.5 * self._lambda_tilde * c_vector[1] ** 2
+              + 0.5 * self._chiPR_tilde * c_vector[0] ** 2 * c_vector[1] ** 2
               + 0.5 * self._kappa_tilde * c_vector[0].grad.mag ** 2)
 
         return fe
 
-    def calculate_mu(self, c_vector):
+    def calculate_mu(self, c_vector, well_center):
         """Calculate chemical potential of the species.
 
         Chemical potential of species 1:
@@ -627,8 +632,8 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         """
 
         # Check that c_vector satisfies the necessary conditions
-        assert len(c_vector) == 2, \
-            "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadraticDimensionless.calculate_mu() is not 2x1"
+        # assert len(c_vector) == 2, \
+            # "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadraticDimensionless.calculate_mu() is not 2x1"
         assert hasattr(c_vector[0], "faceGrad"), \
             "The instance c_vector[0] has no attribute faceGrad associated with it"
         assert hasattr(c_vector[1], "faceGrad"), \
@@ -641,48 +646,14 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         # Calculate the chemical potentials
         mu_1 = ((c_vector[0] - self._c_bar_1) ** 3
                 + self._beta_tilde * (c_vector[0] - self._c_bar_1)
-                - self.get_gaussian_function(c_vector[0].mesh)
+                - self.get_gaussian_function(c_vector[0].mesh, well_center)
                 + self._gamma_tilde * c_vector[1]
+                + self._chiPR_tilde * c_vector[0] * c_vector[1] ** 2
                 - self._kappa_tilde * c_vector[0].faceGrad.divergence)
-        mu_2 = self._gamma_tilde * c_vector[0] + self._lambda_tilde * c_vector[1]
+        mu_2 = self._gamma_tilde * c_vector[0] + self._lambda_tilde * c_vector[1] + self._chiPR_tilde * c_vector[0] ** 2 * c_vector[1]
         mu = [mu_1, mu_2]
 
         return mu
-
-    def calculate_mu_1_bulk(self, c_vector):
-        """Calculate chemical potential associated with bulk free energy of species 1 with the double well potential
-
-        Bulk chemical potential of species 1:
-
-        .. math::
-
-            \\tilde{\\mu}_1[\\tilde{c}_1, \\tilde{c}_2] = \\delta \\tilde{f} / \\delta \\tilde{c}_1 =
-            (\\tilde{c}_1-1)^3 + \\tilde{\\beta} (\\tilde{c}_1-1) + \\tilde{\\gamma} \\tilde{c}_2
-            - \\tilde{c} \\exp^{-|\\vec{r}-\\vec{r}|^2/2\\sigma^2}
-
-
-        Args:
-            c_vector (numpy.ndarray): A 2x1 vector of species concentrations that looks like :math:`[c_1, c_2]`. The
-            concentration variables :math:`c_1` and :math:`c_2` must be instances of the class
-            :class:`fipy.CellVariable` or equivalent. These instances should have an attribute called
-            :attr:`.faceGrad.divergence` that returns the Laplacian of the concentration field for every position in the
-            mesh to compute the surface tension contribution to the chemical potential of species 1
-
-        Returns:
-            mu_1 (fipy.CellVariable): The chemical potential :math:`\\mu_1[\\tilde{c}_1, \\tilde{c}_2]`
-        """
-
-        # Check that c_vector satisfies the necessary conditions
-        assert len(c_vector) == 2, \
-            "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadraticDimensionless.calculate_mu() is not 2x1"
-
-        # Calculate the chemical potentials
-        mu_1 = ((c_vector[0] - self._c_bar_1) ** 3
-                + self._beta_tilde * (c_vector[0] - self._c_bar_1)
-                - self.get_gaussian_function(c_vector[0].mesh)
-                + self._gamma_tilde * c_vector[1])
-
-        return mu_1
 
     def calculate_jacobian(self, c_vector):
         """Calculate the Jacobian matrix of coefficients to feed to the transport equations.
@@ -712,11 +683,11 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
         """
 
         # Check that c_vector satisfies the necessary conditions
-        assert len(c_vector) == 2, \
-            "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadraticDimensionless.calculate_jacobian() \
-            is not 2x1"
+        # assert len(c_vector) == 2, \
+            # "The shape of c_vector passed to TwoCompDoubleWellFHCrossQuadraticDimensionless.calculate_jacobian() \
+            # is not 2x1"
 
         # Calculate the Jacobian matrix
-        jacobian = [[3 * (c_vector[0] - self._c_bar_1) ** 2 + self._beta_tilde, self._gamma_tilde],
-                             [self._gamma_tilde/self._lambda_tilde, 1.0]]
+        jacobian = [[3 * (c_vector[0] - self._c_bar_1) ** 2 + self._beta_tilde + self._chiPR_tilde * c_vector[1] ** 2, self._gamma_tilde + 2 * self._chiPR_tilde * c_vector[0] * c_vector[1]],
+                             [self._gamma_tilde + 2 * self._chiPR_tilde * c_vector[0] * c_vector[1], self._lambda_tilde + self._chiPR_tilde * c_vector[0] ** 2]]
         return jacobian
