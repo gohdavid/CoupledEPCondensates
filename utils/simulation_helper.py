@@ -199,7 +199,8 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                         modelAB_dynamics_type=input_params['modelAB_dynamics_type'],
                                                         degradation_constant=input_params['k_degradation'],
                                                         free_energy=free_en,
-                                                        tau=input_params['tau'])
+                                                        tau=input_params['tau'],
+                                                        total_steps=input_params['total_steps'])
 
         if input_params['reaction_type'] == 1:
             equations.set_production_term(reaction_type=input_params['reaction_type'],

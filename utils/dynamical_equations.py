@@ -5,6 +5,23 @@ import fipy as fp
 import numpy as np
 from . import reaction_rates as rates
 
+class DelayTracker:
+    def __init__(self, steps, tau):
+        self.head = 0
+        self.tau = tau
+        self.concentrations = [None]*steps
+        self.times = np.ones(steps)*np.inf
+    def record(self, time, concentration, step):
+        self.concentrations[step] = concentration
+        self.times[step] = time
+    def find_closest(self,time):
+        return np.argmin((self.times-time)**2)
+    def get_delay(self, time):
+        index = self.find_closest(time-self.tau)
+        self.delayed_concentration = self.concentrations[index]
+        self.concentrations[self.head:index] = [None]*(index-self.head)
+        self.head = index
+        return index
 
 class TwoComponentModel(object):
     """Two component system, with Model B for species 1 and Model AB or reaction-diffusion with reactions for species 2
@@ -333,7 +350,7 @@ class ThreeComponentModel(object):
     with a rate constant :math:`k_2`
     """
 
-    def __init__(self, mobility_1, mobility_2, mobility_3, modelAB_dynamics_type, degradation_constant, free_energy, tau):
+    def __init__(self, mobility_1, mobility_2, mobility_3, modelAB_dynamics_type, degradation_constant, free_energy, tau, total_steps):
         """Initialize an object of :class:`TwoComponentModelBModelAB`.
 
         Args:
@@ -360,8 +377,6 @@ class ThreeComponentModel(object):
         self._M3 = mobility_3
         self._modelAB_dynamics_type = modelAB_dynamics_type
         self._free_energy = free_energy
-        # Time delay
-        self._tau = tau
         # Define the reaction terms in the model equations
         self._production_term = None
         self._degradation_term = rates.FirstOrderReaction(k=degradation_constant)
@@ -369,6 +384,7 @@ class ThreeComponentModel(object):
         self._equations = None
         # The fipy solver used to solve the model equations
         self._solver = None
+        self.delay_tracker = DelayTracker(total_steps,tau)
 
     def set_production_term(self, reaction_type, **kwargs):
         """ Sets the nature of the production term of species :math:`c_2` from :math:`c_1`
@@ -537,3 +553,5 @@ class ThreeComponentModel(object):
         for i in range(len(c_vector)):
             c_vector[i].updateOld()
         # self._psi.updateOld()
+
+class OldThreeComponentModel(object):
