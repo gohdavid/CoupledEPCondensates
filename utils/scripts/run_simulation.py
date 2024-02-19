@@ -62,6 +62,16 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
         time_profile_flag = 1
         number_of_transitions_in_profile = len(input_params['time_profile'])
         transition_counter = 0
+    
+    # Initialize HDF5 file
+    file_operations.initialize_hdf5_file(step=int(step / data_log_frequency),
+                                         total_steps=int(total_steps / data_log_frequency) + 1,
+                                         c_vector=concentration_vector,
+                                         well_center=well_center,
+                                         geometry=simulation_geometry,
+                                         free_energy=free_en,
+                                         target_file=os.path.join(out_directory,'spatial_variables.hdf5'),
+                                         t=t)
 
     while (elapsed <= duration) and (step <= total_steps):
 
@@ -77,7 +87,9 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
                 equations = simulation_helper.set_model_equations(input_params=input_params,
                                                                   concentration_vector=concentration_vector,
                                                                   free_en=free_en,
-                                                                  simulation_geometry=simulation_geometry)
+                                                                  simulation_geometry=simulation_geometry,
+                                                                  target_file=os.path.join(out_directory,
+                                                                                          'spatial_variables.hdf5'))
                 # Update transition counter to reflect that a transition has happened
                 transition_counter = transition_counter + 1
                 # If we have completed all parameter transitions, stop implementing the time profile
@@ -90,9 +102,11 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
         has_converged = False
         # Step over a time step dt and solve the equations
         while dt > dt_min:
-            has_converged, residuals, max_change = equations.step_once(c_vector=concentration_vector, dt=dt,
+            has_converged, residuals, max_change = equations.step_once(c_vector=concentration_vector,
+                                                                       dt=dt, t=t, step=step,
                                                                        well_center=well_center,
-                                                                       max_residual=max_residual, max_sweeps=max_sweeps)
+                                                                       max_residual=max_residual,
+                                                                       max_sweeps=max_sweeps)
             if not has_converged:
                 dt *= 0.5
                 continue
@@ -109,16 +123,17 @@ def run_simulation(input_params, concentration_vector, simulation_geometry, free
                                         well_center=well_center, geometry=simulation_geometry, free_energy=free_en,
                                         dynamical_equations=equations,
                                         residuals=np.max(residuals),max_change=np.max(max_change),
-                                        target_file=os.path.join(out_directory, 'stats.txt'))
+                                        target_file=os.path.join(out_directory, 'stats.txt'),
+                                        input_params = input_params)
             file_operations.write_spatial_variables_to_hdf5_file(step=int(step / data_log_frequency),
                                                                  total_steps=int(total_steps / data_log_frequency) + 1,
                                                                  c_vector=concentration_vector,
                                                                  well_center=well_center,
                                                                  geometry=simulation_geometry,
                                                                  free_energy=free_en,
-                                                                 target_file=os.path.join(out_directory,
-                                                                                          'spatial_variables.hdf5'),
+                                                                 target_file=os.path.join(out_directory,'spatial_variables.hdf5'),
                                                                  t=t)
+
         # Update all the variables that keep track of time
         step += 1
         elapsed += dt
@@ -164,14 +179,6 @@ if __name__ == "__main__":
     fe = simulation_helper.set_free_energy(input_parameters)
     print('Successfully set up the free energy ...')
 
-    # Choose the model equations
-    model_equations = simulation_helper.set_model_equations(input_params=input_parameters,
-                                                            concentration_vector=c_vector,
-                                                            well_center=well_center,
-                                                            free_en=fe,
-                                                            simulation_geometry=sim_geometry)
-    print('Successfully set up model equations ...')
-
     # Create the output directory
     output_directory = os.path.join(args.o, simulation_helper.get_output_dir_name(input_parameters))
     if not os.path.exists(output_directory):
@@ -183,6 +190,16 @@ if __name__ == "__main__":
     file_operations.write_input_params_from_file(input_filename=input_parameter_file,
                                                  target_filename=os.path.join(output_directory, 'input_params.txt'))
     print('Successfully created the output directory to write simulation data ...')
+
+    # Choose the model equations
+    model_equations = simulation_helper.set_model_equations(input_params=input_parameters,
+                                                            concentration_vector=c_vector,
+                                                            well_center=well_center,
+                                                            free_en=fe,
+                                                            simulation_geometry=sim_geometry,
+                                                            target_file=os.path.join(output_directory,
+                                                                                          'spatial_variables.hdf5'))
+    print('Successfully set up model equations ...')
 
     # Run simulation
     print('Running simulation ...')

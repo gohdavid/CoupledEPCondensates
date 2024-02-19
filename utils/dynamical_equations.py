@@ -8,32 +8,22 @@ import h5py
 
 class DelayTracker:
     def __init__(self, steps, tau, concentration, target_file):
-        self.time = 0
-        self.step = 0
         self.tau = tau
         self.times = np.ones(int(steps+1))*np.inf
-        self.times[0] = 0
         self.target_file = target_file
-        self.c_init = c_init
-        self.head = 0
-
-    def record(self, dt):
-        self.times[self.step] = self.time
-        self.time += dt
-        self.step += 1
+        self.concentration = concentration
+        self.index = 0
+ 
+    def get_delay(self, time, step):
+        self.times[step] = time
+        if time-self.tau > 0:
+            self.index = self.find_closest(time-self.tau)
+            with h5py.File(self.target_file, 'r') as f:
+                self.concentration = f["c_{index}".format(index=0)][self.index]
+        return self.concentration
 
     def find_closest(self,time):
         return np.argmin((self.times-time)**2)
- 
-    def get_delay(self):
-        if self.step <= 1:
-            return self.c_init
-        else:
-            index = self.find_closest(self.time-self.tau)
-            self.head = index
-            with h5py.File(self.target_file, 'r') as f:
-                self.concentration = f["c_{index}".format(index=0)][index]
-        return self.concentration
 
 class TwoComponentModel(object):
     """Two component system, with Model B for species 1 and Model AB or reaction-diffusion with reactions for species 2
@@ -181,7 +171,7 @@ class TwoComponentModel(object):
         self._locus_equations = [self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
 
-    def step_once(self, c_vector, well_center, dt, t, max_residual, max_sweeps):
+    def step_once(self, c_vector, well_center, dt, t, step, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
 
         Args:
@@ -429,6 +419,23 @@ class ThreeComponentModel(object):
             self._production_term = rates.LocalizedFirstOrderReaction(k0=basal_rate_constant, k=rate_constant,
                                                                       sigma=sigma, x0=center_point,
                                                                       simulation_geometry=geometry)
+        elif reaction_type == 3:
+            basal_rate_constant = kwargs.get('basal_rate_constant', None)
+            rate_constant = kwargs.get('rate_constant', None)
+            sigma = kwargs.get('sigma', None)
+            center_point = kwargs.get('center_point', None)
+            geometry = kwargs.get('geometry', None)
+            hill_vmax = kwargs.get('hill_vmax', None)
+            hill_c0 = kwargs.get('hill_c0', None)
+            hill_kd = kwargs.get('hill_kd', None)
+            hill_n = kwargs.get('hill_n', None)
+            hill_v0 = kwargs.get('hill_v0', None)
+            self._production_term = rates.LocalizedFirstOrderHillReaction(k0=basal_rate_constant, k=rate_constant,
+                                                                      sigma=sigma, x0=center_point,
+                                                                      hill_vmax=hill_vmax, hill_c0=hill_c0,
+                                                                      hill_kd=hill_kd, hill_n=hill_n,
+                                                                      hill_v0=hill_v0,
+                                                                      simulation_geometry=geometry)
 
     def set_model_equations(self, c_vector, well_center, total_steps):
         """Assemble the model equations given a mesh and concentrations
@@ -481,7 +488,7 @@ class ThreeComponentModel(object):
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
-        self.delay_tracker = DelayTracker(total_steps,self._tau,c_vector[0].value,self._target_file)
+        self.delay_tracker = DelayTracker(total_steps,self._tau,c_vector[2].value,self._target_file)
     
     def set_locus_equations(self, c_vector, well_center):
         self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
@@ -490,7 +497,7 @@ class ThreeComponentModel(object):
                            - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
         self._locus_equations = [self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
-    def step_once(self, c_vector, well_center, dt, t, max_residual, max_sweeps):
+    def step_once(self, c_vector, well_center, dt, t, step, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
 
         Args:
@@ -525,6 +532,8 @@ class ThreeComponentModel(object):
         residual_2 = 1e6
         residual_3 = 1e6
         has_converged = False
+        
+        c_vector[2].value = self.delay_tracker.get_delay(t,step)
 
         # Strang Splitting
         for i in range(max_sweeps):
@@ -548,14 +557,11 @@ class ThreeComponentModel(object):
         max_change_c_1 = np.max([max_change_c_1, np.max(np.abs((c_vector[0] - c_vector[0].old).value))])
         c_vector[0].updateOld()
         
-        c_vector[2].value = self.delay_tracker.get_delay()
         
         residuals = np.array([residual_1, residual_2, residual_3])
         if np.max(residuals) < max_residual:
             has_converged = True
         max_change = np.max([max_change_c_1, max_change_c_2])
-        
-        self.delay_tracker.record(dt)
 
         return has_converged, residuals, max_change
     def update_old(self, c_vector):

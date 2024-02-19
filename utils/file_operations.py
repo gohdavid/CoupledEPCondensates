@@ -5,6 +5,8 @@
 import ast
 import numpy as np
 import h5py
+from fipy.variables.cellVariable import CellVariable
+from numpy import ndarray
 
 
 def input_parse(filename):
@@ -87,7 +89,7 @@ def write_input_params_from_file(input_filename, target_filename):
                 fo.write(line)
 
 
-def write_stats(t, dt, steps, c_vector, well_center, geometry, free_energy, dynamical_equations, residuals, max_change, target_file):
+def write_stats(t, dt, steps, c_vector, well_center, geometry, free_energy, dynamical_equations, residuals, max_change, target_file, input_params):
     """Writes out simulation statistics
 
     Args:
@@ -121,31 +123,40 @@ def write_stats(t, dt, steps, c_vector, well_center, geometry, free_energy, dyna
             stats_list.append('c_{index}_max'.format(index=i))
         stats_list += ['residuals','max_rate_of_change','free_energy',
                        'well_center_x','well_center_y',
-                       'eqn3_potential','eqn3_spring']
+                       'eqn3_potential','eqn3_spring',
+                       'delay_head']
+        # Add space
+        stats_list = [f"{stat:<20}" for stat in stats_list]
         # Write out the header to the file
         with open(target_file, 'w+') as stats:
-            stats.write("\t".join(stats_list) + "\n")
+            stats.write("".join(stats_list) + "\n")
 
     # Write out simulation statistics to the stats file
-    stats_simulation = ["{}".format(int(steps)),
-                        "{:.8f}".format(t),
-                        "{:.3e}".format(dt)]
+    stats_simulation = ["{:<20}".format(int(steps)),
+                        "{:<20.8f}".format(t),
+                        "{:<20.3e}".format(dt)]
     for i in range(len(c_vector)):
-        stats_simulation.append("{:.8f}".format(c_vector[i].cellVolumeAverage.value))
-        stats_simulation.append("{:.8f}".format(min(c_vector[i].value)))
-        stats_simulation.append("{:.8f}".format(max(c_vector[i].value)))
-
-    stats_simulation.append("{:.8f}".format(float(residuals)))
-    stats_simulation.append("{:.8f}".format(float(max_change)))
-    stats_simulation.append("{:.8f}".format(np.sum((free_energy.calculate_fe(c_vector, well_center)
-                                                    * geometry.mesh.cellVolumes).value)))
-    stats_simulation.append("{:.8g}".format(well_center[0]()))
-    stats_simulation.append("{:.8g}".format(well_center[1]()))
-    stats_simulation.append("{:.8g}".format(dynamical_equations._eqn_locus_x[0]()))
-    stats_simulation.append("{:.8g}".format(dynamical_equations._eqn_locus_x[1]()))
+        if type(c_vector[i]) == CellVariable:
+            stats_simulation.append("{:<20.8f}".format(c_vector[i].cellVolumeAverage.value))
+            stats_simulation.append("{:<20.8f}".format(min(c_vector[i].value)))
+            stats_simulation.append("{:<20.8f}".format(max(c_vector[i].value)))
+        elif type(c_vector[i]) == ndarray:
+            stats_simulation.append("{:<20.8f}".format(c_vector[i].mean()))
+            stats_simulation.append("{:<20.8f}".format(min(c_vector[i])))
+            stats_simulation.append("{:<20.8f}".format(max(c_vector[i])))
+       
+    stats_simulation.append("{:<20.8f}".format(float(residuals)))
+    stats_simulation.append("{:<20.8f}".format(float(max_change)))
+    stats_simulation.append("{:<20.8f}".format(np.sum((free_energy.calculate_fe(c_vector, well_center) * geometry.mesh.cellVolumes).value)))
+    stats_simulation.append("{:<20.8f}".format(well_center[0]()))
+    stats_simulation.append("{:<20.8f}".format(well_center[1]()))
+    stats_simulation.append("{:<20.8f}".format(dynamical_equations._eqn_locus_x[0]()))
+    stats_simulation.append("{:<20.8f}".format(dynamical_equations._eqn_locus_x[1]()))
+    if input_params["model_type"] == 2:
+        stats_simulation.append("{:<20.8f}".format(dynamical_equations.delay_tracker.index))
 
     with open(target_file, 'a') as stats:
-        stats.write("\t".join(stats_simulation) + "\n")
+        stats.write("".join(stats_simulation) + "\n")
 
 
 def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_center, geometry, free_energy, target_file, t):
@@ -174,21 +185,34 @@ def write_spatial_variables_to_hdf5_file(step, total_steps, c_vector, well_cente
         list_of_spatial_variables.append("c_{index}".format(index=i))
         list_of_spatial_variables.append("mu_{index}".format(index=i))
 
+    # Write out simulation data to the HDF5 file
+    with h5py.File(target_file, 'a') as f:
+        mu_vector = free_energy.calculate_mu(c_vector, well_center)
+        for i in range(len(c_vector)):
+            # if type(c_vector[i]) == CellVariable:
+                # If fipy CellVariable, use its value method
+            f["c_{index}".format(index=i)][step, :] = c_vector[i].value
+            if i < 2:
+                f["mu_{index}".format(index=i)][step, :] = mu_vector[i].value
+            # elif type(c_vector[i]) == ndarray:
+            #     # If numpy array, save directly
+            #     f["c_{index}".format(index=i)][step, :] = c_vector[i]
+            f["t"][step, :] = t
+            f["locus_position"][step, :] = well_center[:]
+            
+def initialize_hdf5_file(step, total_steps, c_vector, well_center, geometry, free_energy, target_file, t):
+    # Create the list of variable names to store. We are going to store the concentration fields and the chemical
+    # potentials
+    list_of_spatial_variables = []
+    for i in range(len(c_vector)):
+        list_of_spatial_variables.append("c_{index}".format(index=i))
+        list_of_spatial_variables.append("mu_{index}".format(index=i))
+
     # Create the HDF5 file if it doesn't exist
     if step == 0:
         number_of_mesh_points = np.shape(c_vector)[1]
         with h5py.File(target_file, 'w') as f:
             for sv in list_of_spatial_variables:
-                print(sv)
                 f.create_dataset(sv, (total_steps, number_of_mesh_points))
             f.create_dataset("t", (total_steps, 1))
             f.create_dataset("locus_position", (total_steps, 2))
-
-    # Write out simulation data to the HDF5 file
-    with h5py.File(target_file, 'a') as f:
-        mu_vector = free_energy.calculate_mu(c_vector, well_center)
-        for i in range(len(c_vector)):
-            f["c_{index}".format(index=i)][step, :] = c_vector[i].value
-            # f["mu_{index}".format(index=i)][step, :] = mu_vector[i].value
-            f["t"][step, :] = t
-            f["locus_position"][step, :] = well_center[:]

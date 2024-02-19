@@ -137,7 +137,7 @@ def set_free_energy(input_params):
                                                                                     rest_length=input_params['rest_length'])
     return free_en
 
-def set_model_equations(input_params, concentration_vector, well_center, free_en, simulation_geometry):
+def set_model_equations(input_params, concentration_vector, well_center, free_en, simulation_geometry,target_file):
     """Set dynamical equations for the model
 
     Args:
@@ -179,16 +179,6 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                         center_point=input_params['reaction_center'],
                                         geometry=simulation_geometry)
 
-        elif input_params['reaction_type'] == 3:
-            equations.set_production_term(reaction_type=input_params['reaction_type'],
-                                        basal_rate_constant=input_params['basal_k_production'],
-                                        rate_constant=input_params['k_production'],
-                                        sigma=input_params['reaction_sigma'],
-                                        center_point=input_params['reaction_center'],
-                                        geometry=simulation_geometry,
-                                        hill_coefficient=input_params['hill_coefficient'],
-                                        hill_threshold=input_params['hill_threshold'],
-                                        hill_prefactor=input_params['hill_prefactor'])
 
         equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
     elif input_params["model_type"] == 2:
@@ -200,7 +190,7 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                         degradation_constant=input_params['k_degradation'],
                                                         free_energy=free_en,
                                                         tau=input_params['tau'],
-                                                        total_steps=input_params['total_steps'])
+                                                        target_file=target_file)
 
         if input_params['reaction_type'] == 1:
             equations.set_production_term(reaction_type=input_params['reaction_type'],
@@ -215,17 +205,19 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                         geometry=simulation_geometry)
 
         elif input_params['reaction_type'] == 3:
-            equations.set_production_term(reaction_type=input_params['reaction_type'],
-                                        basal_rate_constant=input_params['basal_k_production'],
-                                        rate_constant=input_params['k_production'],
-                                        sigma=input_params['reaction_sigma'],
-                                        center_point=input_params['reaction_center'],
-                                        geometry=simulation_geometry,
-                                        hill_coefficient=input_params['hill_coefficient'],
-                                        hill_threshold=input_params['hill_threshold'],
-                                        hill_prefactor=input_params['hill_prefactor'])
+                    equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                                basal_rate_constant=input_params['basal_k_production'],
+                                                rate_constant=input_params['k_production'],
+                                                sigma=input_params['reaction_sigma'],
+                                                center_point=input_params['reaction_center'],
+                                                geometry=simulation_geometry,
+                                                hill_c0=input_params['hill_c0'],
+                                                hill_kd=input_params['hill_kd'],
+                                                hill_vmax=input_params['hill_vmax'],
+                                                hill_n=input_params['hill_n'],
+                                                hill_v0=input_params['hill_v0'])
 
-        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
+        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center,total_steps=input_params['total_steps'])
 
     return equations
 
@@ -254,6 +246,7 @@ def get_output_dir_name(input_params):
                   f"_kt_{str(input_params['k_tilde'])}"
                   f"_rl_{str(input_params['rest_length'][0])}"
                   f"_wd_{str(input_params['well_depth'])}"
+                #   f"_t_{str(input_params['tau'])}"
                   )
 
     #  + '_K_' + str(input_params['basal_k_production']) \

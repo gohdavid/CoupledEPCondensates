@@ -164,7 +164,6 @@ class simDir:
         self.aspect_ratio = xydist[:,0]/xydist[:,1]
         self.eccentricity = np.sqrt(np.where(self.aspect_ratio<1,1-self.aspect_ratio**2,1-1/self.aspect_ratio**2))
         self.radius = np.sqrt(((self.edge_arr-self.com[:,None,:])**2).sum(axis=2))
-        return self.com, self.eccentricity, self.radius
 
     def n_condensate(self):
         n_cluster_lst = []
