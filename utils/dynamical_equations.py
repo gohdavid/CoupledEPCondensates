@@ -5,6 +5,7 @@ import fipy as fp
 import numpy as np
 from . import reaction_rates as rates
 import h5py
+import time
 
 class DelayTracker:
     def __init__(self, steps, tau, concentration, target_file):
@@ -195,11 +196,14 @@ class TwoComponentModel(object):
 
         """
         # Solve for the locus position with a time step of 1/ratio*dt using the Euler method
-        ratio = 100
+        t = time.time()
+        ratio = 10
         for small_step in range(ratio):
             self.set_locus_equations(c_vector, well_center)
             well_center[0].setValue(well_center[0]+self._locus_equations[0]*dt/ratio)
             well_center[1].setValue(well_center[1]+self._locus_equations[1]*dt/ratio)
+        delta = t - time.time()
+        print(f"Locus: {delta:.3f}")
 
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6
@@ -207,6 +211,7 @@ class TwoComponentModel(object):
         residual_3 = 1e6
         has_converged = False
 
+        t = time.time()
         # Strang Splitting
         for i in range(max_sweeps):
             residual_1 = self._equations[0].sweep(dt=0.5*dt, var=c_vector[0], solver=self._solver)
@@ -233,6 +238,8 @@ class TwoComponentModel(object):
         if np.max(residuals) < max_residual:
             has_converged = True
         max_change = np.max([max_change_c_1, max_change_c_2])
+        delta = t - time.time()
+        print(f"Fipy: {delta:.3f}")
 
         return has_converged, residuals, max_change
 

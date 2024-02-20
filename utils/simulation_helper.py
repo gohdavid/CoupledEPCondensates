@@ -246,7 +246,8 @@ def get_output_dir_name(input_params):
                   f"_kt_{str(input_params['k_tilde'])}"
                   f"_rl_{str(input_params['rest_length'][0])}"
                   f"_wd_{str(input_params['well_depth'])}"
-                #   f"_t_{str(input_params['tau'])}"
+                  f"_t_{str(input_params['tau'])}"
+                  f"_kd_{str(input_params['k_degradation'])}"
                   )
 
     #  + '_K_' + str(input_params['basal_k_production']) \

@@ -101,6 +101,8 @@ def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=3
                                                                     3))
                 cbar.ax.tick_params(labelsize=30)
                 ax[i].set_title(movie_parameters['titles'][i], fontsize=40)
+                ax[i].set_aspect('equal', 'box')
+
             fig.savefig(fname=movies_directory + '/Movie_step_{step}.png'.format(step=t), dpi=300, format='png')
             plt.close(fig)
 

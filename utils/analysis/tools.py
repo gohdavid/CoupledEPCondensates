@@ -65,6 +65,9 @@ class simDir:
                     conc_arr = concentration_dynamics[f'c_{i}'][:]
                     conc_arr = conc_arr[~np.all(conc_arr == 0, axis=1)]
                     self.concentration_profile.append(conc_arr)
+                if "t" in concentration_dynamics.keys():
+                    self.time = concentration_dynamics["t"][:]
+                
             self.n_frames = len(self.concentration_profile[0])
         if plot_limits:
             self.getPlotLimits()
@@ -253,9 +256,10 @@ class simDir:
 
 class springPhaseDiagram:
     def __init__(self,
-                 directory: str):
+                 directory: str,
+                 sweep_file: str = "sweep_parameters.txt"):
         self.sweep_directory = Path(directory)
-        self.sweep_file = self.sweep_directory / "sweep_parameters.txt"
+        self.sweep_file = self.sweep_directory / sweep_file
         self.sweep_parameters = [line.split(",")[0] for line in self.sweep_file.read_text().splitlines()]
 
     def extract_data(self,frame):
@@ -280,3 +284,41 @@ class springPhaseDiagram:
                                 "aspect_ratio": sim.aspect_ratio[frame],
                                 "mask": sim.xy[sim.mask[frame,:],:]}
 
+def periodicity_plot(sim,sigma=1.5,threshold=7):
+    from scipy.signal import find_peaks
+    x = gaussian_filter1d(sim.com[:,0],sigma)
+    t = sim.time
+    fig,axes = plt.subplots(3,1,sharex=True)
+    fig.set_size_inches(3,3)
+
+
+    axes[0].plot(t,x)
+    truncx = x[sim.com[:,0]<threshold]
+    trunct = t[sim.com[:,0]<threshold]
+    peaks = find_peaks(truncx,distance=100)
+    troughs = find_peaks(-truncx,distance=100)
+    axes[0].scatter(trunct[peaks[0]],truncx[peaks[0]],alpha=0.3)
+    axes[0].scatter(trunct[troughs[0]],truncx[troughs[0]],alpha=0.3)
+    diffs = np.diff(trunct[peaks[0]],axis=0)
+    locst = (trunct[peaks[0]][:-1] + trunct[peaks[0]][1:])/2
+    for i in range(len(diffs)):
+        axes[0].annotate(f"{diffs[i].item():.0f}",(locst[i],7),ha='center')
+    # np.diff(trunct[troughs[0]],axis=0)
+
+
+    x = np.var(sim.radius,axis=1)
+    t = sim.time
+    axes[1].plot(t,x)
+
+    x = sim.eccentricity
+    t = sim.time
+    axes[2].plot(t,x)
+
+
+    [ax.axvline(i, color='grey', ls='dashed') for i in trunct[peaks[0]] for ax in axes]
+
+    axes[2].set_xlabel("Time")
+    axes[0].set_ylabel("Center of Mass")
+    axes[1].set_ylabel("Variance of Radius")
+    axes[2].set_ylabel("Eccentricity")
+    return fig,axes
