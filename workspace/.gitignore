@@ -9,3 +9,5 @@ input_parameters*
 *.txt
 *.mp4
 *.png
+*.pkl
+generate_sweep*
