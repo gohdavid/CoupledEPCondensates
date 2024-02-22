@@ -165,7 +165,8 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                         mobility_3=input_params['M3'],
                                                         modelAB_dynamics_type=input_params['modelAB_dynamics_type'],
                                                         degradation_constant=input_params['k_degradation'],
-                                                        free_energy=free_en)
+                                                        free_energy=free_en,
+                                                        ratio=input_params["ratio"])
 
         if input_params['reaction_type'] == 1:
             equations.set_production_term(reaction_type=input_params['reaction_type'],
@@ -190,7 +191,8 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                         degradation_constant=input_params['k_degradation'],
                                                         free_energy=free_en,
                                                         tau=input_params['tau'],
-                                                        target_file=target_file)
+                                                        target_file=target_file,
+                                                        ratio=input_params["ratio"])
 
         if input_params['reaction_type'] == 1:
             equations.set_production_term(reaction_type=input_params['reaction_type'],
