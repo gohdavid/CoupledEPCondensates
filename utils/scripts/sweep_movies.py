@@ -71,7 +71,6 @@ if __name__ == "__main__":
 
         movie()
         {
-            echo "ON"
             source activate CoupledEPCondensates
             output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
             make-movie --i $output_folder

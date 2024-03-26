@@ -12,7 +12,8 @@ import scipy.interpolate as interp
 from sklearn.cluster import DBSCAN
 from pathlib import Path
 from typing import Union, Optional
-from scipy.ndimage import gaussian_filter1d
+from scipy.ndimage import gaussian_filter1d, uniform_filter1d
+from scipy.signal import find_peaks
 import matplotlib as mpl
 from utils import plot
 import multiprocessing as mp
@@ -25,12 +26,12 @@ class simDir:
                  movie_parameters: str = "movie_parameters.txt"):
         self.directory = Path(directory)
 
-        # Parse simulation parameter input. Simulation directories have this file by
+        # Parse selfulation parameter input. selfulation directories have this file by
         # default.
         self.params_file = self.directory / "input_params.txt"
         self.params = input_parse(self.params_file)
 
-        # Simulation directories have this file by default.
+        # selfulation directories have this file by default.
         self.hdf5_file: str =  self.directory / "spatial_variables.hdf5"
 
         # Parse movie parameter input.
@@ -38,17 +39,17 @@ class simDir:
         if os.path.isfile(self.movie_params_file):
             self.movie_params = input_parse(self.movie_params_file)
         elif self.params["n_concentrations"] == 2.0:
-            print("Using default movie parameters.")
+            # print("Using default movie parameters.")
             self.movie_params = {'num_components': 2.0,
                                  'color_map': ['Blues', 'Reds'],
                                  'titles': ['Protein', 'RNA'],
                                  'figure_size': [15, 6]}
         elif self.params["n_concentrations"] == 3.0:
-            print("Using default movie parameters.")
+            # print("Using default movie parameters.")
             self.movie_params = {'num_components': 3.0,
                                  'color_map': ['Blues', 'Reds', 'Greens'],
                                  'titles': ['Protein', 'RNA', 'Active Protein'],
-                                 'figure_size': [22, 6]}
+                                 'figure_size': [22.5, 6]}
 
     def run(self, geo: bool=True, hdf5: bool=True,
             plot_limits: bool=True, condensate: bool=True):
@@ -66,14 +67,14 @@ class simDir:
                     conc_arr = conc_arr[~np.all(conc_arr == 0, axis=1)]
                     self.concentration_profile.append(conc_arr)
                 if "t" in concentration_dynamics.keys():
-                    self.time = concentration_dynamics["t"][:]
+                    self.time = np.ravel(concentration_dynamics["t"][:])
                 
             self.n_frames = len(self.concentration_profile[0])
         if plot_limits:
             self.getPlotLimits()
 
     def makeSubdirectory(self, subdirectory:str):
-        # Make a directory within the simulation directory
+        # Make a directory within the selfulation directory
         subdir_path = self.directory / subdirectory
         subdir_path.mkdir(exist_ok=True)
         return subdir_path
@@ -167,6 +168,7 @@ class simDir:
         self.aspect_ratio = xydist[:,0]/xydist[:,1]
         self.eccentricity = np.sqrt(np.where(self.aspect_ratio<1,1-self.aspect_ratio**2,1-1/self.aspect_ratio**2))
         self.radius = np.sqrt(((self.edge_arr-self.com[:,None,:])**2).sum(axis=2))
+        self.radius_variance = np.var(self.radius,axis=1)
 
     def n_condensate(self):
         n_cluster_lst = []
@@ -212,27 +214,17 @@ class simDir:
         e = self.eccentricity[~np.isnan(self.eccentricity)]
         r = self.radius[~np.isnan(self.radius).any(axis=1),:]
         y = com[:,0]
-        f = gaussian_filter1d(y,5)
+        f = uniform_filter1d(y,5)
         fig, ax = plt.subplots(2,2)
         axes = np.ravel(ax)
         fig.set_size_inches((6,3))
-        axes[0].plot(y,
-                        label="Raw",
-                        color=cmap[0])
-        axes[0].plot(f,
-                        label="Gaussian filter",
-                        color=cmap[1])
+        axes[0].plot(y,label="Raw",color=cmap[0])
+        axes[0].plot(f,label="Uniform filter",color=cmap[1])
         axes[0].legend()
         axes[0].set_xlabel("Frame")
         axes[0].set_ylabel("Distance\nfrom locus")
-        axes[1].plot(com[:,0],
-                        -np.gradient(y),
-                        label="Raw",
-                        color=cmap[0])
-        axes[1].plot(com[:,0],
-                        -np.gradient(f),
-                        label="Gaussian filter",
-                        color=cmap[1])
+        axes[1].plot(y,-np.gradient(y),label="Raw",color=cmap[0])
+        axes[1].plot(f,-np.gradient(f),label="Uniform filter",color=cmap[1])
         axes[1].set_xlabel("Distance\nfrom locus")
         axes[1].set_ylim(bottom=0)
         axes[1].set_ylabel("Condensate\nvelocity")
@@ -240,8 +232,7 @@ class simDir:
         axes[2].plot(e)
         axes[2].set_ylabel("Eccentricity")
         axes[2].set_xlabel("Frame")
-        var_r = np.var(r,axis=1)
-        axes[3].plot(var_r)
+        axes[3].plot(self.radius_variance)
         axes[3].set_ylabel("Radius\nvariance")
         axes[3].set_xlabel("Frame")
         fig.tight_layout()
@@ -251,9 +242,30 @@ class simDir:
     def rna(self):
         volumes = self.geometry.mesh.cellVolumes
         volume_vector = np.reshape(volumes,(len(volumes),1))
-        self.rna_amount = self.concentration_profile[1]@volume_vector
-        return self.rna_amount
+        self.rna_amount = np.ravel(self.concentration_profile[1]@volume_vector)
+    
+    def write_analysis(self):
+        dct = {}
+        time = getattr(self,"time",np.ones(self.n_frames)*np.nan)
+        dct["time "] = time
+        dct["center_of_mass"] = self.com[:,0]
+        dct["eccentricity"] = self.eccentricity
+        dct["variance_of_radius"] = self.radius_variance
+        dct["mean_radius"] = np.mean(self.radius,axis=1)
+        dct["rna_amount"] = self.rna_amount
+        velocity = np.diff(self.com[:,0])/np.diff(time)
+        dct["velocity"] = velocity
+        # dct["speed"] = np.abs(velocity)
+        df = pd.DataFrame.from_dict(dct,orient="index").T
+        df.to_csv(self.directory / "analysis.csv")
 
+    def periodicity(self,threshold):
+        if not hasattr(self,"rna_amount"):
+            self.rna()
+        start = np.argmin((self.time-threshold)**2)
+        self.peaks = find_peaks(self.rna_amount[start:])[0] + start
+        self.troughs = find_peaks(-self.rna_amount[start:])[0] + start
+            
 class springPhaseDiagram:
     def __init__(self,
                  directory: str,
@@ -282,43 +294,33 @@ class springPhaseDiagram:
         return relevant_params | {"rna_amount": sim.rna_amount.flatten()[frame],
                                 "condensate_com": sim.com[frame,0],
                                 "aspect_ratio": sim.aspect_ratio[frame],
-                                "mask": sim.xy[sim.mask[frame,:],:]}
+                                "mask": sim.xy[sim.mask[frame,:],:],
+                                "concentration": sim.concentration_profile[0][frame,:][sim.mask[frame,:]]}
 
-def periodicity_plot(sim,sigma=1.5,threshold=7):
-    from scipy.signal import find_peaks
-    x = gaussian_filter1d(sim.com[:,0],sigma)
-    t = sim.time
-    fig,axes = plt.subplots(3,1,sharex=True)
-    fig.set_size_inches(3,3)
-
-
-    axes[0].plot(t,x)
-    truncx = x[sim.com[:,0]<threshold]
-    trunct = t[sim.com[:,0]<threshold]
-    peaks = find_peaks(truncx,distance=100)
-    troughs = find_peaks(-truncx,distance=100)
-    axes[0].scatter(trunct[peaks[0]],truncx[peaks[0]],alpha=0.3)
-    axes[0].scatter(trunct[troughs[0]],truncx[troughs[0]],alpha=0.3)
-    diffs = np.diff(trunct[peaks[0]],axis=0)
-    locst = (trunct[peaks[0]][:-1] + trunct[peaks[0]][1:])/2
+def periodicity_plot(sim,threshold,leftlim=0,rightlim=20000):
+    sim.periodicity(threshold)
+    rna = np.ravel(sim.rna_amount)
+    com = np.ravel(sim.com[:,0])
+    time = np.ravel(sim.time)
+    fig,axes = plt.subplots(4,1,sharex=True)
+    fig.set_size_inches(5,3)
+    axes[0].plot(time,rna)
+    start = np.argmin((time-threshold)**2)
+    axes[0].scatter(time[sim.peaks],rna[sim.peaks],alpha=0.3)
+    axes[0].scatter(time[sim.troughs],rna[sim.troughs],alpha=0.3)
+    diffs = np.diff(time[sim.peaks],axis=0)
+    locst = (time[sim.peaks][:-1] + time[sim.peaks][1:])/2
     for i in range(len(diffs)):
-        axes[0].annotate(f"{diffs[i].item():.0f}",(locst[i],7),ha='center')
-    # np.diff(trunct[troughs[0]],axis=0)
-
-
-    x = np.var(sim.radius,axis=1)
-    t = sim.time
-    axes[1].plot(t,x)
-
-    x = sim.eccentricity
-    t = sim.time
-    axes[2].plot(t,x)
-
-
-    [ax.axvline(i, color='grey', ls='dashed') for i in trunct[peaks[0]] for ax in axes]
-
-    axes[2].set_xlabel("Time")
-    axes[0].set_ylabel("Center of Mass")
-    axes[1].set_ylabel("Variance of Radius")
-    axes[2].set_ylabel("Eccentricity")
-    return fig,axes
+        axes[0].annotate(f"{diffs[i].item():.0f}",(locst[i],0),ha='center',rotation=90,
+                         va='bottom')
+    axes[1].plot(time,com)
+    axes[2].plot(time,np.var(sim.radius,axis=1))
+    axes[3].plot(time,sim.eccentricity)
+    [ax.axvline(i, color='grey', ls='dashed') for i in time[sim.peaks] for ax in axes]
+    axes[3].set_xlabel("Time")
+    axes[0].set_ylabel("RNA\nAmount")
+    axes[1].set_ylabel("Center of\nMass")
+    axes[2].set_ylabel("Variance of\nRadius")
+    axes[3].set_ylabel("Eccentricity")
+    axes[3].set_xlim(left=leftlim,right=rightlim)
+    return fig,axes,sim.peaks,sim.troughs

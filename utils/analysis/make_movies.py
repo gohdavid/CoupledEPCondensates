@@ -28,7 +28,7 @@ from matplotlib import rc
 # plt.rcParams["text.usetex"] = True
 
 
-def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=30):
+def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=60):
     """Function that writes out movies of concentration profiles for 2 component simulations in 2D
 
     Args:

@@ -9,8 +9,6 @@ import itertools
 import argparse
 import utils.file_operations as file_operations
 import textwrap
-from utils.simulation_helper import get_output_dir_name
-from pathlib import Path
 
 if __name__ == "__main__":
     """This script generates a separate input_parameter file for each parameter in sweep_parameters file
@@ -58,55 +56,34 @@ if __name__ == "__main__":
         # Write parameter files
         file_operations.write_input_params_from_dict(input_parameters=input_parameters,
                                                      target_filename=input_parameter_file_name_during_sweep)
-        if Path(get_output_dir_name(input_parameters)).exists():
-            print("Skip")
-        else:
-            # Submit job using this parameter file
-            run_simulation_slurm = """\
-            #!/bin/bash
-            #SBATCH -J CoupledEPCondensates
-            #SBATCH --mail-user davidgoh
-            #SBATCH -p sched_mit_arupc_long
-            #SBATCH -t 7-00:00:00
-            #SBATCH --mem-per-cpu 4000
-            cd "$SLURM_SUBMIT_DIR"
-            echo $PWD
+        # Submit job using this parameter file
+        # Write a default run_simulation.slurm file if it does not exist in the
+        # repository
+        run_simulation_slurm = """\
+        #!/bin/bash
+        #SBATCH -J CoupledEPCondensates
+        #SBATCH --mail-user davidgoh
+        #SBATCH -p sched_mit_arupc,sched_mit_arupc_long
+        #SBATCH -t 3:00:00
+        #SBATCH --mem-per-cpu 4000
+        cd "$SLURM_SUBMIT_DIR"
+        echo $PWD
 
-            stage_parameters()
-            {
-                cp $input_file input_parameters_$SLURM_JOBID.txt
-            }
+        movie()
+        {
+            source activate CoupledEPCondensates
+            output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
+            /nfs/arupclab001/davidgoh/CoupledEPCondensates/utils/analysis/make_stats.py --i $output_folder
+            conda deactivate
+            echo "DONE"
+        }
+        movie
+        """
+        run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
+        with open("run_simulation.slurm","w") as fhandle:
+            fhandle.write(run_simulation_slurm)
 
-            run_program()
-            {
-                source activate CoupledEPCondensates
-                run-simulation --i $input_file --o $out_folder
-                conda deactivate
-            }
+        os.system('sbatch --export=input_file={},out_folder={} run_simulation.slurm'
+                    .format(input_parameter_file_name_during_sweep, output_directory))
 
-            cleanup_files()
-            {
-                rm input_parameters_$SLURM_JOBID.txt
-            }
-
-            movie()
-            {
-                source activate CoupledEPCondensates
-                output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
-                make-movie --i $output_folder
-                conda deactivate
-                echo "DONE"
-            }
-            stage_parameters
-            run_program
-            cleanup_files
-            movie
-            """
-            run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
-            with open("run_simulation.slurm","w") as fhandle:
-                fhandle.write(run_simulation_slurm)
-
-            os.system('sbatch --export=input_file={},out_folder={} run_simulation.slurm'
-                        .format(input_parameter_file_name_during_sweep, output_directory))
-
-            file_counter = file_counter + 1
+        file_counter = file_counter + 1

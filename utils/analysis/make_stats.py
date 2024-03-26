@@ -20,13 +20,6 @@ if __name__ == "__main__":
     # if not (Path(folder) / "movies").exists():
     sim = simDir(folder,movie_params)
     sim.run()
-    # if args.movie:
-    sim.makeMovie(int(fps))
-    # if args.figures:
-    sim.makeFigure(i=0)
-    sim.makeFigure(i=1)
-    # if args.properties:
     sim.condensate()
     sim.rna()
-    sim.condensate_property_plot()
     sim.write_analysis()

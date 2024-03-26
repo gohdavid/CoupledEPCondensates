@@ -158,19 +158,16 @@ class TwoComponentModel(object):
                      + self._production_term.rate(c_vector[0])
                      - self._degradation_term.rate(c_vector[1])
                      )
-        self._equations = [eqn_1, eqn_2]
-        
-        # Define the relative tolerance of the fipy solver
-        self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
 
-    def set_locus_equations(self, c_vector, well_center):
         # Localization locus dynamics
         self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
         self._eqn_locus_y = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
-        self._locus_equations = [self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
+        self._equations = [eqn_1, eqn_2, self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
+        # Define the relative tolerance of the fipy solver
+        self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
 
     def step_once(self, c_vector, well_center, dt, t, step, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
@@ -197,9 +194,9 @@ class TwoComponentModel(object):
         """
         # Solve for the locus position with a time step of 1/ratio*dt using the Euler method
         for small_step in range(self._ratio):
-            self.set_locus_equations(c_vector, well_center)
-            well_center[0].setValue(well_center[0]+self._locus_equations[0]*dt/self._ratio)
-            well_center[1].setValue(well_center[1]+self._locus_equations[1]*dt/self._ratio)
+            self.set_model_equations(c_vector, well_center)
+            well_center[0].setValue(well_center[0]+self._equations[2]*dt/self._ratio)
+            well_center[1].setValue(well_center[1]+self._equations[3]*dt/self._ratio)
 
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6
@@ -474,14 +471,14 @@ class ThreeComponentModel(object):
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
                      == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][0], var=c_vector[0])
                      + fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
-                     + self._production_term.rate(c_vector[0])
+                     + self._production_term.rate(c_vector[2])
                      - self._degradation_term.rate(c_vector[1])
                      )
         elif self._modelAB_dynamics_type == 2:
             # Reaction-diffusion dynamics for species 2
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
                      == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
-                     + self._production_term.rate(c_vector[0])
+                     + self._production_term.rate(c_vector[2])
                      - self._degradation_term.rate(c_vector[1])
                      )
 
@@ -494,6 +491,10 @@ class ThreeComponentModel(object):
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
+
+    def set_delay_tracker(self,c_vector,total_steps):
+        self.delay_tracker = DelayTracker(total_steps,self._tau,c_vector[2].value,self._target_file)
+
 
     def step_once(self, c_vector, well_center, dt, t, step, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.

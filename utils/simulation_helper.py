@@ -219,7 +219,8 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                 hill_n=input_params['hill_n'],
                                                 hill_v0=input_params['hill_v0'])
 
-        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center,total_steps=input_params['total_steps'])
+        equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
+        equations.set_delay_tracker(c_vector=concentration_vector,total_steps=input_params['total_steps'])
 
     return equations
 
