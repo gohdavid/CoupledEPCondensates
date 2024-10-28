@@ -1,4 +1,4 @@
-# PF_Stability_Analysis
+# RNA gradients guide condensates toward promoters, facilitating increased enhancer-promoter contacts and condensate-promoter kissing
 
 Use `setup.sh` to set up the Conda environment.
 This project uses Conda and Poetry.
