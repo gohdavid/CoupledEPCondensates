@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import rc
+import subprocess
 
 # Suppress any outputs to an interactive interface
 # matplotlib.use('Agg')
@@ -87,21 +88,26 @@ def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=6
             # Generate and save plots
             fig, ax = plt.subplots(1, int(movie_parameters['num_components']), figsize=movie_parameters['figure_size'])
             for i in range(int(movie_parameters['num_components'])):
-                cs = ax[i].tricontourf(mesh.x, mesh.y, concentration_profile[i][t],
-                                       levels=np.linspace(int(np.floor(plotting_range[i][0]*100))*0.01,
-                                                          int(np.ceil(plotting_range[i][1]*100))*0.01,
-                                                          256),
-                                       cmap=movie_parameters['color_map'][i])
-                # ax[i].tick_params(axis='both', which='major', labelsize=20)
-                ax[i].xaxis.set_tick_params(labelbottom=False, bottom=False)
-                ax[i].yaxis.set_tick_params(labelleft=False, left=False)
-                plt.setp(ax[i].spines.values(), visible=False)
-                cbar = fig.colorbar(cs, ax=ax[i], ticks=np.linspace(int(np.floor(plotting_range[i][0]*100))*0.01,
-                                                                    int(np.ceil(plotting_range[i][1]*100))*0.01,
-                                                                    3))
-                cbar.ax.tick_params(labelsize=30)
-                ax[i].set_title(movie_parameters['titles'][i], fontsize=40)
-                ax[i].set_aspect('equal', 'box')
+                try:
+                    cs = ax[i].tricontourf(mesh.x, mesh.y, concentration_profile[i][t],
+                                        levels = np.linspace(int(np.floor(plotting_range[i][0]*100))*0.01,
+                                                                int(np.ceil(plotting_range[i][1]*100))*0.01,
+                                                                256),
+                                        #    vmin=plotting_range[i][0],
+                                        #    vmax=plotting_range[i][1],
+                                        cmap=movie_parameters['color_map'][i])
+                    # ax[i].tick_params(axis='both', which='major', labelsize=20)
+                    ax[i].xaxis.set_tick_params(labelbottom=False, bottom=False)
+                    ax[i].yaxis.set_tick_params(labelleft=False, left=False)
+                    plt.setp(ax[i].spines.values(), visible=False)
+                    cbar = fig.colorbar(cs, ax=ax[i], ticks=np.linspace(int(np.floor(plotting_range[i][0]*100))*0.01,
+                                                                        int(np.ceil(plotting_range[i][1]*100))*0.01,
+                                                                        3))
+                    cbar.ax.tick_params(labelsize=30)
+                    ax[i].set_title(movie_parameters['titles'][i], fontsize=40)
+                    ax[i].set_aspect('equal', 'box')
+                except:
+                    print("Failed!")
 
             fig.savefig(fname=movies_directory + '/Movie_step_{step}.png'.format(step=t), dpi=300, format='png')
             plt.close(fig)
@@ -116,9 +122,23 @@ def write_movies_two_component_2d(path, hdf5_file, movie_parameters, mesh, fps=6
     # print(file_names)
     file_paths = [os.path.join(movies_directory, f) for f in file_names]
     # print(file_paths)
-    clip = mp.ImageSequenceClip(file_paths, fps=fps)
-    clip.write_videofile(os.path.join(path, 'movies', 'Movie.mp4'), fps=fps)
-    clip.close()
+    # clip = mp.ImageSequenceClip(file_paths, fps=fps)
+    # clip.write_videofile(os.path.join(path, 'movies', 'Movie.mp4'), fps=fps)
+    # clip.close()
+
+    command = [
+        "ffmpeg",
+        "-y",
+        "-framerate", f"{fps}",
+        "-i", "Movie_step_%d.png",
+        "-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+        "-c:v", "libx264",
+        "-pix_fmt", "yuv420p",
+        "Movie.mp4"
+    ]
+
+    # Run the command
+    subprocess.run(command, check=True, cwd=movies_directory)
 
     # delete individual images
     for f in file_paths:

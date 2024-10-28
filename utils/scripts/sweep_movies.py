@@ -63,8 +63,8 @@ if __name__ == "__main__":
         #!/bin/bash
         #SBATCH -J CoupledEPCondensates
         #SBATCH --mail-user davidgoh
-        #SBATCH -p sched_mit_arupc,sched_mit_arupc_long
-        #SBATCH -t 3:00:00
+        #SBATCH -p sched_mit_arupc_long
+        #SBATCH -t 12:00:00
         #SBATCH --mem-per-cpu 4000
         cd "$SLURM_SUBMIT_DIR"
         echo $PWD

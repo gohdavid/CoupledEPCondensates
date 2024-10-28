@@ -180,7 +180,15 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                         center_point=input_params['reaction_center'],
                                         geometry=simulation_geometry)
 
-
+        elif input_params['reaction_type'] == 4:
+            equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                        basal_rate_constant=input_params['basal_k_production'],
+                                        rate_constant=input_params['k_production'],
+                                        sigma=input_params['reaction_sigma'],
+                                        center_point=input_params['reaction_center'],
+                                        geometry=simulation_geometry,
+                                        linear_m=input_params['linear_m'],
+                                        linear_c=input_params['linear_c'],)
         equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
     elif input_params["model_type"] == 2:
         assert input_params["n_concentrations"] == 3, "ThreeComponentModel only supports 3 concentrations"
@@ -218,6 +226,16 @@ def set_model_equations(input_params, concentration_vector, well_center, free_en
                                                 hill_vmax=input_params['hill_vmax'],
                                                 hill_n=input_params['hill_n'],
                                                 hill_v0=input_params['hill_v0'])
+                    
+        elif input_params['reaction_type'] == 4:
+                    equations.set_production_term(reaction_type=input_params['reaction_type'],
+                                                basal_rate_constant=input_params['basal_k_production'],
+                                                rate_constant=input_params['k_production'],
+                                                sigma=input_params['reaction_sigma'],
+                                                center_point=input_params['reaction_center'],
+                                                geometry=simulation_geometry,
+                                                linear_m=input_params['linear_m'],
+                                                linear_c=input_params['linear_c'],)
 
         equations.set_model_equations(c_vector=concentration_vector,well_center=well_center)
         equations.set_delay_tracker(c_vector=concentration_vector,total_steps=input_params['total_steps'])

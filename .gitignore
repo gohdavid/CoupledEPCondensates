@@ -3,3 +3,7 @@
 __pycache__
 run_simulation.slurm
 analysis.csv
+figures
+*pdf
+*.svg
+*.zip

@@ -69,7 +69,7 @@ if __name__ == "__main__":
         cd "$SLURM_SUBMIT_DIR"
         echo $PWD
 
-        movie()
+        stats()
         {
             source activate CoupledEPCondensates
             output_folder=$(python -c "from utils.simulation_helper import get_output_dir_name as outname; from utils.file_operations import input_parse;  print(outname(input_parse('$input_file')))")
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             conda deactivate
             echo "DONE"
         }
-        movie
+        stats
         """
         run_simulation_slurm = textwrap.dedent(run_simulation_slurm)
         with open("run_simulation.slurm","w") as fhandle:

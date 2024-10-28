@@ -117,5 +117,20 @@ class LocalizedFirstOrderHillReaction(object):
              reaction_rate (fipy.ImplicitSourceTerm): Reaction rate
         """
         # return self._rate_constant * concentration
-        hill_effect = self._hill_vmax * (concentration-self._hill_c0)**self._hill_n / ((concentration-self._hill_c0)**self._hill_n + self._hill_kd**2) + self._hill_v0 
+        hill_effect = self._hill_vmax * (concentration-self._hill_c0)**self._hill_n / ((concentration-self._hill_c0)**self._hill_n + self._hill_kd**self._hill_n) + self._hill_v0 
         return fp.ImplicitSourceTerm(coeff=self._rate_constant, var=hill_effect)
+
+class LocalizedFirstOrderLinear(object):
+    def __init__(self, k0, k, sigma, x0, linear_m, linear_c, simulation_geometry):
+        self._k0 = k0
+        self._k = k
+        self._sigma = sigma
+        self._x0 = x0
+        self._geometry = simulation_geometry
+        self._rate_constant = self._k0 + self._k * np.exp(
+            -self._geometry.get_mesh_distances_squared_from_point(reference_point=self._x0) / (2.0 * self._sigma ** 2))
+        self._linear_m  = linear_m
+        self._linear_c = linear_c
+    def rate(self, concentration):
+        linear_effect = self._linear_m * concentration + self._linear_c
+        return fp.ImplicitSourceTerm(coeff=self._rate_constant, var=linear_effect)

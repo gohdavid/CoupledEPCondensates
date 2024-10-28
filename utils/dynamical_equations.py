@@ -111,7 +111,18 @@ class TwoComponentModel(object):
             self._production_term = rates.LocalizedFirstOrderReaction(k0=basal_rate_constant, k=rate_constant,
                                                                       sigma=sigma, x0=center_point,
                                                                       simulation_geometry=geometry)
-
+        elif reaction_type == 4:
+            basal_rate_constant = kwargs.get('basal_rate_constant', None)
+            rate_constant = kwargs.get('rate_constant', None)
+            sigma = kwargs.get('sigma', None)
+            center_point = kwargs.get('center_point', None)
+            geometry = kwargs.get('geometry', None)
+            linear_m = kwargs.get('linear_m', None)
+            linear_c = kwargs.get('linear_c', None)
+            self._production_term = rates.LocalizedFirstOrderLinear(k0=basal_rate_constant, k=rate_constant,
+                                                                      sigma=sigma, x0=center_point,
+                                                                      linear_m=linear_m, linear_c=linear_c,
+                                                                      simulation_geometry=geometry)
     def set_model_equations(self, c_vector, well_center):
         """Assemble the model equations given a mesh and concentrations
 
@@ -154,7 +165,7 @@ class TwoComponentModel(object):
         elif self._modelAB_dynamics_type == 2:
             # Reaction-diffusion dynamics for species 2
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
-                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
+                     == fp.DiffusionTerm(coeff=self._M2, var=c_vector[1])
                      + self._production_term.rate(c_vector[0])
                      - self._degradation_term.rate(c_vector[1])
                      )
@@ -192,11 +203,6 @@ class TwoComponentModel(object):
             dt
 
         """
-        # Solve for the locus position with a time step of 1/ratio*dt using the Euler method
-        for small_step in range(self._ratio):
-            self.set_model_equations(c_vector, well_center)
-            well_center[0].setValue(well_center[0]+self._equations[2]*dt/self._ratio)
-            well_center[1].setValue(well_center[1]+self._equations[3]*dt/self._ratio)
 
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6
@@ -434,6 +440,18 @@ class ThreeComponentModel(object):
                                                                       hill_kd=hill_kd, hill_n=hill_n,
                                                                       hill_v0=hill_v0,
                                                                       simulation_geometry=geometry)
+        elif reaction_type == 4:
+            basal_rate_constant = kwargs.get('basal_rate_constant', None)
+            rate_constant = kwargs.get('rate_constant', None)
+            sigma = kwargs.get('sigma', None)
+            center_point = kwargs.get('center_point', None)
+            geometry = kwargs.get('geometry', None)
+            linear_m = kwargs.get('linear_m', None)
+            linear_c = kwargs.get('linear_c', None)
+            self._production_term = rates.LocalizedFirstOrderLinear(k0=basal_rate_constant, k=rate_constant,
+                                                                      sigma=sigma, x0=center_point,
+                                                                      linear_m=linear_m, linear_c=linear_c,
+                                                                      simulation_geometry=geometry)
 
     def set_model_equations(self, c_vector, well_center):
         """Assemble the model equations given a mesh and concentrations
@@ -477,7 +495,7 @@ class ThreeComponentModel(object):
         elif self._modelAB_dynamics_type == 2:
             # Reaction-diffusion dynamics for species 2
             eqn_2 = (fp.TransientTerm(var=c_vector[1])
-                     == fp.DiffusionTerm(coeff=self._M2 * jacobian[1][1], var=c_vector[1])
+                     == fp.DiffusionTerm(coeff=self._M2, var=c_vector[1])
                      + self._production_term.rate(c_vector[2])
                      - self._degradation_term.rate(c_vector[1])
                      )
@@ -494,7 +512,6 @@ class ThreeComponentModel(object):
 
     def set_delay_tracker(self,c_vector,total_steps):
         self.delay_tracker = DelayTracker(total_steps,self._tau,c_vector[2].value,self._target_file)
-
 
     def step_once(self, c_vector, well_center, dt, t, step, max_residual, max_sweeps):
         """Function that solves the model equations over a time step of dt to get the concentration profiles.
@@ -519,12 +536,6 @@ class ThreeComponentModel(object):
             dt
 
         """
-        # Solve for the locus position with a time step of 1/ratio*dt using the Euler method
-
-        for small_step in range(self._ratio):
-            self.set_model_equations(c_vector, well_center)
-            well_center[0].setValue(well_center[0]+self._equations[2]*dt/self._ratio)
-            well_center[1].setValue(well_center[1]+self._equations[3]*dt/self._ratio)
 
         # Solve the model equations for a time step of dt by sweeping max_sweeps times
         residual_1 = 1e6

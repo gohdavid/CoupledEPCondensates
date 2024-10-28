@@ -43,16 +43,19 @@ class simDir:
             self.movie_params = {'num_components': 2.0,
                                  'color_map': ['Blues', 'Reds'],
                                  'titles': ['Protein', 'RNA'],
-                                 'figure_size': [15, 6]}
+                                 'figure_size': [14, 6],
+                                 'frequency': 1}
         elif self.params["n_concentrations"] == 3.0:
             # print("Using default movie parameters.")
             self.movie_params = {'num_components': 3.0,
                                  'color_map': ['Blues', 'Reds', 'Greens'],
                                  'titles': ['Protein', 'RNA', 'Active Protein'],
-                                 'figure_size': [22.5, 6]}
+                                 'figure_size': [22.5, 6],
+                                 'frequency': 20}
 
     def run(self, geo: bool=True, hdf5: bool=True,
-            plot_limits: bool=True, condensate: bool=True):
+            plot_limits: bool=True, condensate: bool=True,
+            start=0, end=-1):
         if geo:
             # Load Gmsh geometry
             self.geometry = set_mesh_geometry(self.params)
@@ -63,11 +66,11 @@ class simDir:
                 # Read concentration profile data from files
                 self.concentration_profile = []
                 for i in range(int(self.movie_params['num_components'])):
-                    conc_arr = concentration_dynamics[f'c_{i}'][:]
+                    conc_arr = concentration_dynamics[f'c_{i}'][start:end]
                     conc_arr = conc_arr[~np.all(conc_arr == 0, axis=1)]
                     self.concentration_profile.append(conc_arr)
                 if "t" in concentration_dynamics.keys():
-                    self.time = np.ravel(concentration_dynamics["t"][:])
+                    self.time = np.ravel(concentration_dynamics["t"][start:end])
                 
             self.n_frames = len(self.concentration_profile[0])
         if plot_limits:
@@ -141,6 +144,36 @@ class simDir:
             '{}.png'.format(self.movie_params['titles'][i]),
                     dpi=300, format='png')
         return fig
+    def frameFigure(self,
+                   i:int,
+                   t:int,
+                   cmap=None):
+        cmap = cmap or self.movie_params['color_map'][i]
+        fig,ax = plt.subplots()
+        cs = ax.tricontourf(self.geometry.mesh.x,
+                            self.geometry.mesh.y,
+                            self.concentration_profile[i][t],
+                            levels = np.linspace(int(np.floor(self.plotting_range[i][0]*100))*0.01,
+                                                    int(np.ceil(self.plotting_range[i][1]*100))*0.01,
+                                                    256),
+                            cmap=cmap)
+        # border = plt.Circle((0,0), self.params["radius"],
+        #                     color='tab:gray', fill=False, linewidth=2)
+        # ax.add_patch(border)
+        ax.autoscale_view()
+        ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
+        ax.yaxis.set_tick_params(labelleft=False, left=False)
+        ax.set_aspect('equal', 'box')
+        plt.setp(ax.spines.values(), visible=False)
+        # cbar = fig.colorbar(cs,
+        #                     ax=ax,
+        #                     ticks=np.linspace(int(self.plotting_range[i][0]*100)*0.01,
+        #                                     int(self.plotting_range[i][1]*100)*0.01,
+        #                                     3),
+        #                     shrink=0.6
+        #                     )
+        # cbar.ax.tick_params(labelsize=30)
+        return fig,ax
 
     def condensate(self,
                    i:int=0,
@@ -247,24 +280,28 @@ class simDir:
     def write_analysis(self):
         dct = {}
         time = getattr(self,"time",np.ones(self.n_frames)*np.nan)
-        dct["time "] = time
+        dct["time"] = time
         dct["center_of_mass"] = self.com[:,0]
         dct["eccentricity"] = self.eccentricity
         dct["variance_of_radius"] = self.radius_variance
         dct["mean_radius"] = np.mean(self.radius,axis=1)
         dct["rna_amount"] = self.rna_amount
+        dct["c_light"] = np.nanmean(np.where(~self.mask,self.concentration_profile[0],np.nan),axis=1)
+        dct["c_dense"] = np.nanmean(np.where(self.mask,self.concentration_profile[0],np.nan),axis=1)
+        dct["volume"] = (self.mask*self.geometry.mesh.cellVolumes).sum(axis=1)
         velocity = np.diff(self.com[:,0])/np.diff(time)
         dct["velocity"] = velocity
+        dct["aspect"] = self.aspect_ratio
         # dct["speed"] = np.abs(velocity)
         df = pd.DataFrame.from_dict(dct,orient="index").T
         df.to_csv(self.directory / "analysis.csv")
 
-    def periodicity(self,threshold):
+    def periodicity(self,tinit,peak_kw={},trough_kw={}):
         if not hasattr(self,"rna_amount"):
             self.rna()
-        start = np.argmin((self.time-threshold)**2)
-        self.peaks = find_peaks(self.rna_amount[start:])[0] + start
-        self.troughs = find_peaks(-self.rna_amount[start:])[0] + start
+        start = np.argmin((self.time-tinit)**2)
+        self.peaks = find_peaks(self.rna_amount[start:],**peak_kw)[0] + start
+        self.troughs = find_peaks(-self.rna_amount[start:],**trough_kw)[0] + start
             
 class springPhaseDiagram:
     def __init__(self,
