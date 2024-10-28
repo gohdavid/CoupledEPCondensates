@@ -7,3 +7,4 @@ figures
 *pdf
 *.svg
 *.zip
+project.egg-info

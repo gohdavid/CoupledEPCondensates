@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+s#!/usr/bin/env bash
 
 # Environment and script setup for CoupledEPCondensates repository.
 # For Unix systems.
