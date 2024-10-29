@@ -1,15 +1,14 @@
-# RNA gradients guide condensates toward promoters, facilitating increased enhancer-promoter contacts and condensate-promoter kissing
+# Finite volume simulations of condensates and localized RNA transcription
+
+This package can be used to perform finite volume simulations of a condensate responding to localized RNA transcription. The condensate can be coupled to an attractive Gaussian potential and RNA transcription can respond to the concentration of protein after a time delay.
 
 Use `setup.sh` to set up the Conda environment.
-This project uses Conda and Poetry.
-See `pyproject.toml` for dependencies.
 
-Gmsh is installed externally and loaded with `module load gmsh/4.10.5`.
-An alternative is to use `poetry add gmsh` or `pip install gmsh` on the Conda environment.
+Gmsh is installed externally and loaded with `module load gmsh/4.10.5`. An alternative is to use `pip install gmsh` on the Conda environment.
 
 To run the simulations:
 
-1. Create an input parameter text file under /inputs to define your system. An example file is provided. Please go through the code documentation to understand what each parameter in this file means.
+1. Create an input parameter text file under /inputs to define your system. An example file is provided. The code documentation has information on what each parameter in this file means.
 2. Run simulations on the command line using: ``python run_simulation.py --i path/to/input/parameter/file --o path/to/output/directory/to/write/simulation/data``
 3. Make movies of your simulations using the script analysis/make_movies.py
 4. To make movies, run the following command on the command line: ``python make_movies.py --i path/to/directory/containing/simulation/data``
