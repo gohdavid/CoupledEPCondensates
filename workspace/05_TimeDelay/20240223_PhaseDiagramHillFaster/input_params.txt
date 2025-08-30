@@ -1,0 +1,56 @@
+free_energy_type, 3.0
+c_bar_1, 4.0
+beta_tilde, -0.25
+gamma_tilde, -0.1
+kappa_tilde, 0.05
+lamda_tilde, 1.0
+well_depth, 0.0
+well_center, (0.0, 0.0)
+sigma, 2.5
+modelAB_dynamics_type, 2.0
+reaction_type, 3
+M1, 1.0
+M2, 1.0
+basal_k_production, 0.0
+k_production, 0.2
+k_degradation, 1.0
+reaction_sigma, 2.5
+reaction_center, (0.0, 0.0)
+n_concentrations, 3.0
+random_seed, 42.0
+initial_values, (3.53, 0.0, 3.53)
+initial_condition_noise_variance, (0.0, 0.0, 0.0)
+nucleate_seed, (1, 0, 1)
+seed_value, (5.5, 0.0, 5.5)
+nucleus_size, (2.0, 0.0, 2.0)
+location, ((10, 0), (0, 0), (10, 0))
+dimension, 2.0
+circ_flag, 1.0
+radius, 15.0
+dx, 0.2
+dt, 1e-4
+dt_max, 5
+dt_min, 1e-8
+max_change_allowed, 0.05
+duration, 20000.0
+total_steps, 5000.0
+max_sweeps, 5.0
+max_residual, 0.1
+data_log, 1.0
+time_profile, ()
+model_type, 2
+tau, 0 
+M3, 0.1
+k_tilde, 0
+r_p, (0,0)
+rest_length, (0.0,0.0)
+well_depth, 0.0
+well_center, (0.0, 0.0)
+sigma, 1
+chiPR_tilde, 0
+hill_c0, 3
+hill_kd, 1
+hill_vmax, 17.5
+hill_n, 2
+hill_v0, 0
+ratio,1

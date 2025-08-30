@@ -6,7 +6,6 @@ _*
 input_parameters*
 *.out
 *.hdf5
-*.txt
 *.mp4
 *.png
 *.pkl
