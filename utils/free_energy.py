@@ -470,29 +470,6 @@ class TwoCompDoubleWellFHCrossQuadraticDimensionless(object):
         return jacobian
 
 class TwoCompDoubleWellFHCrossQuadraticDimensionlessCoupled(object):
-    """Dimensionless free energy of two component system with a double well self, and FH cross interactions.
-
-    This class describes the free energy density of a two component system given by the below expression:
-
-    .. math::
-
-       \\tilde{f}[\\tilde{c}_1, \\tilde{c}_2, \\vec{r}] =
-       \\tilde{f}_{bulk}[\\tilde{c}_1, \\tilde{c}_2] + \\tilde{f}_{BL}[\\tilde{c}_1, \\vec{r}] =
-       0.25 (\\tilde{c}_1-\\bar{c_1})^4 + 0.5 \\tilde{\\beta} (\\tilde{c}_1-\\bar{c_1})^2
-       + \\tilde{\\gamma} \\tilde{c}_1 \\tilde{c}_2 + 0.5 \\tilde{\\lambda} \\tilde{c}^2_2
-       + 0.5 \\tilde{\\kappa} |\\tilde{\\nabla} \\tilde{c}_1|^2
-       - \\tilde{c} e^{-|\\vec{r}-\\vec{r}_0|^2/2\\sigma^2} \\tilde{c}_1
-
-    Interactions between molecules of species 1 are described by a quartic-well potential. If
-    :math:`\\tilde{\\beta} < 0`, then we get a double-well and species 1 can phase separate by itself.
-
-    Interactions between molecules of species 2 are described by a quadratic potential. For this term,
-    :math:`\\tilde{\\lambda}` has to be > 0. Otherwise, the self diffusion of species 2 will cause all molecules to
-    collapse into a point.
-
-    The cross interactions between the species are described by a mean-field product of concentrations with the
-    interaction strength captured by a Flory parameter :math:`\\tilde{\\gamma}`
-    """
 
     def __init__(self, c_bar_1, beta_tilde, gamma_tilde, lamda_tilde, chiPR_tilde, kappa_tilde, well_center, well_depth, sigma, k_tilde, r_p, rest_length):
         """Initialize an object of :class:`TwoCompDoubleWellFHCrossQuadratic`.
