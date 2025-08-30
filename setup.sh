@@ -14,6 +14,7 @@ poetry install
 # Copy Gmsh compiled at engaging
 module load gmsh/4.10.5
 cp $(which gmsh) ${CONDA_PREFIX}/bin/
+# or conda install -c conda-forge gmsh
 
 # Define Symlinks in conda environment
 # For engaging, may need to add export PATH="$HOME/miniforge3/bin:$PATH" to .bashrc
