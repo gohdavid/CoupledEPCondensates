@@ -20,8 +20,8 @@ We need to disable the new repulsion term by setting adding `chiPR_tilde, 0` to 
 Note that although there is a Gaussian well in the code, we have set the `well_depth` to zero.
 Hence, we are effectively simulating an untethered condensate with attraction to RNA only.
 
-3. **Add Dummy Parameters**. The script will fail without several new parameters, which are used in the directory naming convention (`get_output_dir_name` in `simulation_helper.py`). Add the following with dummy values:
-    1. `k_tilde`, `M3`, `rest_length`, `r_p`, and `ratio`. These are unused. They were initially for enhancer dynamics, but we have removed these dynamics from the finite volume simulations. The enhancer dynamics are now handled by Brownian sumlations. These variables are still in the directory name for compatibility, but they are not relevant to this work.
+3. **Add Legacy and Unused (Dummy) Parameters**. The script will fail without several new parameters, which are used in the directory naming convention (`get_output_dir_name` in `simulation_helper.py`). Add the following with dummy values:
+    1. The parameters `k_tilde`, `M3`, `rest_length`, `r_p`, and `ratio` are legacy parameters. While they must be present in the `input_params.txt` files, they are no longer used in the simulations. Originally, these parameters were used for the enhancer dynamics, but these dynamics have been removed from the finite volume simulations and is now handled by Brownian dynamics simulations. The parameters are still parsed by the scripts and used for naming directories, but because they are not used by the simulations (i.e., not used in the update steps), they can safely be set to zero (they have no effect).
     2. `tau`. This is for the three-component model's time delay, and are unused in these simulations.
 
 To ensure compatibility, change the `free_energy_type` to `3` and add the following lines to `input_params.txt`:

@@ -170,12 +170,14 @@ class TwoComponentModel(object):
                      - self._degradation_term.rate(c_vector[1])
                      )
 
+        ##### NOTE: This is legacy code, not used in the current simulations i.e., the locus equations have been removed from step_once #####
         # Localization locus dynamics
         self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
         self._eqn_locus_y = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
         self._equations = [eqn_1, eqn_2, self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
+        ##### ------------------------------------------------------------------------------------------------------------------------- #####
 
         # Define the relative tolerance of the fipy solver
         self._solver = fp.DefaultSolver(tolerance=1e-10, iterations=2000)
@@ -460,11 +462,14 @@ class ThreeComponentModel(object):
                      - self._degradation_term.rate(c_vector[1])
                      )
 
+        ##### NOTE: This is legacy code, not used in the current simulations i.e., the locus equations have been removed from step_once #####
         # Localization locus dynamics
         self._eqn_locus_x = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.x-well_center[0]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[0] - self._free_energy._r_p[0] - self._free_energy._rest_length[0])]
         self._eqn_locus_y = [self._M3*(self._free_energy._well_depth  * c_vector[0] * (c_vector[0].mesh.y-well_center[1]) / (self._free_energy._sigma**2) * np.exp(-((c_vector[0].mesh.x-well_center[0])**2 + (c_vector[0].mesh.y-well_center[1])**2) / (2*self._free_energy._sigma**2)) * c_vector[0].mesh.cellVolumes).sum(),
                            - self._M3 * self._free_energy._k_tilde *(well_center[1] - self._free_energy._r_p[1] - self._free_energy._rest_length[1])]
+        ##### ------------------------------------------------------------------------------------------------------------------------- #####
+
         self._equations = [eqn_1, eqn_2, self._eqn_locus_x[0]+self._eqn_locus_x[1], self._eqn_locus_y[0]+self._eqn_locus_y[1]]
 
         # Define the relative tolerance of the fipy solver
